@@ -1,37 +1,28 @@
-/* 
+/*
 This is a test sketch for the Adafruit assembled Motor Shield for Arduino v2
-It won't work with v1.x motor shields! Only for the v2's with built in PWM
-control
-
-For use with the Adafruit Motor Shield v2 
----->	http://www.adafruit.com/products/1438
-*/
-
+ It won't work with v1.x motor shields! Only for the v2's with built in PWM
+ control
+ For use with the Adafruit Motor Shield v2
+ ----> http://www.adafruit.com/products/1438
+ */
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_PWMServoDriver.h"
 
-// Create the motor shield object with the default I2C address
-Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-// Or, create it with a different I2C address (say for stacking)
-// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
-
-// Select which 'port' M1, M2, M3 or M4. In this case, M1
-
+// Setting up Motors on Adafruit Motorshield
+// Left Motor is Motor 4 and Right Motor is Motor 3
+Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *myMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *myMotor2 = AFMS.getMotor(4);
 
-// You can also make another motor on port M2
-//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+#define MOTORSPEED 255 //255 is maximum speed
+
 
 void setup() {
-  Serial.begin(9600);           // set up Serial library at 9600 bps
+  Serial.begin(115200); // set up Serial library at 9600 bps
   Serial.println("Adafruit Motorshield v2 - DC Motor test!");
-
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
-  
-  // Set the speed to start, from 0 (off) to 255 (max speed)
+  AFMS.begin();
+ 
   myMotor->setSpeed(150);
   myMotor->run(FORWARD);
   // turn on motor
@@ -42,97 +33,60 @@ void setup() {
   // turn on motor
   myMotor2->run(RELEASE);
 }
-
 void loop() {
-  uint8_t i;
-  
-  Serial.print("Forward ");
-  moveForward(myMotor, myMotor2);
-  delay (50);
-  Serial.print("Backward ");
-  moveBackward(myMotor, myMotor2); 
-  delay (50);
-  Serial.print("Right");
-  moveRight(myMotor, myMotor2);
-  delay (50);
-  Serial.print("Left");
-  moveLeft(myMotor, myMotor2);
-  delay (50);  
-  Serial.print("tech");
-  myMotor->run(RELEASE);
-  myMotor2->run(RELEASE);
-  delay(1000);
-}
-
+  uint8_t i;   
+      if(Serial.available() > 0){
+        char test = Serial.read();
+        Serial.println();
+        //Serial.println(test);            
+        
+        if(test == 'w'){
+          Serial.print("Forward ");
+          moveForward(myMotor, myMotor2);          
+        } else if (test == 's'){
+          Serial.print("Backward ");
+          moveBackward(myMotor, myMotor2);          
+        } else if (test == 'a'){
+          Serial.print("Left");
+          moveLeft(myMotor, myMotor2);
+        } else if (test == 'd'){
+          Serial.print("Right");
+          moveRight(myMotor, myMotor2);          
+        }
+        else if(test == ' '){
+          myMotor->run(RELEASE);
+          myMotor2->run(RELEASE);
+        }
+      }        
+}   
 void moveForward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
-  
   uint8_t i;
-  
-  motor->run(BACKWARD);
-  motor2->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    motor->setSpeed(i);  
-    motor2->setSpeed(i); 
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    motor->setSpeed(i);
-    motor2->setSpeed(i); 
-    delay(10);
-  }   
-}
-
-
-void moveBackward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
-  
-  uint8_t i;
-  
   motor->run(FORWARD);
   motor2->run(FORWARD);
-  for (i=0; i<255; i++) {
-    motor->setSpeed(i);  
-    motor2->setSpeed(i); 
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    motor->setSpeed(i);
-    motor2->setSpeed(i); 
-    delay(10);
-  }   
+  motor->setSpeed(MOTORSPEED);
+  motor2->setSpeed(MOTORSPEED);
+}
+
+void moveBackward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
+  uint8_t i;
+  motor->run(BACKWARD);
+  motor2->run(BACKWARD);
+  motor->setSpeed(MOTORSPEED);
+  motor2->setSpeed(MOTORSPEED); 
 }
 
 void moveRight(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
-  
-  uint8_t i;
-  
-  motor->run(FORWARD);
-  motor2->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    motor->setSpeed(i);  
-    motor2->setSpeed(i); 
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    motor->setSpeed(i);
-    motor2->setSpeed(i); 
-    delay(10);
-  } 
+ uint8_t i;
+  motor->run(BACKWARD);
+  motor2->run(FORWARD);
+  motor->setSpeed(MOTORSPEED);
+  motor2->setSpeed(MOTORSPEED); 
 }
 
 void moveLeft(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
-  
   uint8_t i;
-  
-  motor2->run(FORWARD);
-  motor->run(BACKWARD);
-  for (i=0; i<255; i++) {
-    motor->setSpeed(i);  
-    motor2->setSpeed(i); 
-    delay(10);
-  }
-  for (i=255; i!=0; i--) {
-    motor->setSpeed(i);
-    motor2->setSpeed(i); 
-    delay(10);
-  } 
+  motor->run(FORWARD);
+  motor2->run(BACKWARD);
+  motor->setSpeed(MOTORSPEED);
+  motor2->setSpeed(MOTORSPEED); 
 }

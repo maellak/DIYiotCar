@@ -16,96 +16,84 @@ $carIsRunning=TRUE;
 $carBackwards=FALSE;
 $frenoDistance=15;
 
+if (!$motor_signal = fopen("/dev/ttyACM1", "w")){ // usb2, motors control
+
+    echo "Cannot link with motors, wrong usb connected";
+    exit;
+
+}
+
+if (!$handle = fopen("/dev/ttyACM0", "r")){      // we just read data
+
+      echo "Cannot link with sonar, wrong usb connected";
+      exit; 
+}
+
+else{
+
+       while (($buffer = fgets($handle, 4096)) !== false) {
+
+              echo $buffer; //$buffer =    '@200*300*100#' ; //echo $buffer;
+                
+                
+              $sonar_raw = substr($buffer, 1, strlen($buffer) - 2);
+              var_dump($sonar_raw);
+              $sonar_movement = explode('*', $sonar_raw);
+              var_dump($sonar_movement);
+
+              //socket_write($socket, $sonar_movement, strlen($sonar_movement));
+
+              $distance_LEFT = $sonar_movement[0];
+              $distance = $sonar_movement[1];
+              $distance_RIGHT = $sonar_movement[2];
 
 
-if ($handle = fopen("/dev/ttyACM0", "r")){      // we just read data
-
-        while (($buffer1 = fgets($handle, 4096)) !== false) {
-
-               echo $buffer1;
-                //$buffer1 =    '@200*300*100#' ;
-                //echo $buffer1;
-                //var_dump($buffer1);
-                $a = substr($buffer1, 1, strlen($buffer1) - 2);
-                var_dump($a);
-                $b = explode('*', $a);
-                var_dump($b);
-
-               $distance_LEFT = $b[0];
-               $distance = $b[1];
-               $distance_RIGHT = $b[2];
-
-                //echo $distance_LEFT;
-
-
-
-               /*if ($buffer == 'F'){
-
-                echo 'Moving Forward';
-
-
-               }
+              if ($distance > $frenoDistance && !$carBackwards)
+              {
+                  echo "Distance to front object:" . findObject( $distance );
+                  if ( !$carIsRunning ) runCar( $motor_signal );
+              }
+              //else if ( distance<=10 && !stopCar) // υπαρχει αντικείμενο 
                
-                              if ($buffer == 'B'){
 
-                echo 'Moving Backwards';
+              else if ( ($distance<=$frenoDistance && $distance!=0) || $carBackwards ){
 
+                      if ( $carIsRunning )      /////το όχημα πρέπει να σταματήσει
+                      {
+                          stopCar( $distance, $motor_signal );
 
-               }    */
+                      }
+                      if (  $distance_LEFT>=$distance_RIGHT && $distance_LEFT>=$frenoDistance ) // πορεία προς τα αριστερά
+                      {
+                             
+                             $carBackwards=false;
+                             turnLEFT($motor_signal);
+                      }
+                      else if ( $distance_LEFT<$distance_RIGHT && $distance_RIGHT>=$frenoDistance ) // πορεία προς τα δεξιά
+                      {
+                            
+                             $carBackwards=false;
+                             turnRIGHT($motor_signal);
+                      }
+                      else    // πορεία προς τα πίσω
+                      {
+                          
+                           $carBackwards=true;
+                             
+                      }
+              }
 
-
-
-
-                //socket_write($socket, $buffer, strlen($buffer));
-
-                                        if (distance > frenoDistance && !carBackwards)
-                                        {
-                                          findObject( distance );
-                                          if ( !carIsRunning ) runCar( );
-                                        }
-                                  //else if ( distance<=10 && !stopCar)
-                                  /////�^��^�α�^��^�ει αν�^�ικειμενο
-
-                                  else if ( distance<=frenoDistance && distance!=0 || carBackwards )
-                                  {
-
-
-                                     if ( carIsRunning )
-                                     {
-                                         /////�^�ο ο�^�ημα �^��^�ε�^�ει να �^��^�αμα�^�η�^�ει
-                                       stopCar( distance );
-                                     }
-
-
-                                    if (  $distance_LEFT>=$distance_RIGHT && $distance_LEFT>=$frenoDistance )
-                                     {
-                                         ////�^�ο ο�^�ημα �^��^��^�ε�^�ει να κινηθει α�^�ι�^��^�ε�^�α
-                                         $carBackwards=false;
-                                         turnLEFT();
-                                     }
-                                     else if ( $distance_LEFT<$distance_RIGHT && $distance_RIGHT>=$frenoDistance )
-                                     {
-                                         ////�^�ο ο�^�ημα �^��^��^�ε�^�ει να κινηθει δεξια
-                                         $carBackwards=false;
-                                         turnRIGHT();
-                                     }
-                                     else
-                                     {
-                                         ////�^�ο ο�^�ημα �^��^��^�ε�^�ει να κινηθει �^�ι�^��^
-                                        $carBackwards=true;
-                                        //Serial.println("B");
-                                     }
-                                  }
-                                  else if( distance==0 )
-                                  {
-                                      if (! carIsRunning ) runCar( );
-                                      noObject( );
-                                  }
-                                }
-
-
-
-
+              else if( $distance==0 ){
+                      
+                  if (! $carIsRunning ) runCar($motor_signal);
+                  noObject();
+              }
         }
+
+       fclose($motor_signal);
+
+
+}
+
 
 

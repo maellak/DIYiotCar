@@ -2,59 +2,59 @@
 
 		
 		
-		function runCar($signal){
+function runCar($signal){
 		
-		    $carIsRunning=true;
-		    echo 'Running!';
+	$carIsRunning=true;
+	echo 'Running!';
         $move = 'w';
         echo $move;
-		    fwrite($signal, $move);
+	fwrite($signal, $move);
 		
-		}
+}
 		
-		function stopCar($dist, $signal)
-		{
-		    findObject( dist );
-		    $carIsRunning=false;
-		    echo 'Car stop!';
+function stopCar($dist, $signal){
+	
+	findObject( dist );
+	$carIsRunning=false;
+	echo 'Car stop!';
         $move = 's'; 
-		    fwrite($signal, $move);
+	fwrite($signal, $move);
 		
-		}
+}
 		
 		
-		function turnLEFT(){
+function turnLEFT(){
 		   
-		  echo 'turn left';
-      $move = 'a';
-		  fwrite($signal, $move;
+	echo 'turn left';
+        $move = 'a';
+	fwrite($signal, $move;
 		
-		}
+}
 		
-		function turnRIGHT(){
+function turnRIGHT(){
 		
-		  echo 'turn right';
-      $move = 'd';
-		  fwrite($signal, $move);
+	echo 'turn right';
+        $move = 'd';
+	fwrite($signal, $move);
 		
-		}
+}
 		
-		function findObject( $dist ){
+function findObject( $dist ){
 		
-		  //$dist=int( dist*10 )/10;
+	//$dist=int( dist*10 )/10;
       
-		  for($i=0;$i<=$dist;$i++)
-		  {
-		    echo "*";
-		  }
-		  echo "|\n";
-		}
+	for($i=0;$i<=$dist;$i++){
+	
+		 echo "*";
+	}
+	echo "|\n";
+}
 		
 		
-		function noObject(){
+function noObject(){
 		
-		    echo "No object, keep moving :)";
-		}
+	echo "No object, keep moving :)";
+}
 
 
 ?>

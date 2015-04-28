@@ -4,37 +4,30 @@
 		
 function runCar($signal){
 		
-	$carIsRunning=true;
 	echo 'Running!';
-        $move = 'w';
-        echo $move;
 	fwrite($signal, $move);
 		
 }
 		
-function stopCar($dist, $signal){
+function stopCar($dist, $signal,$move){
 	
-	findObject( dist );
-	$carIsRunning=false;
-	echo 'Car stop!';
-        $move = 's'; 
+	findObject($dist);
+	echo 'Car stop!'; 
 	fwrite($signal, $move);
 		
 }
 		
 		
-function turnLEFT(){
+function turnLEFT($signal){
 		   
 	echo 'turn left';
-        $move = 'a';
-	fwrite($signal, $move;
+	fwrite($signal, $move);
 		
 }
 		
-function turnRIGHT(){
+function turnRIGHT($signal){
 		
 	echo 'turn right';
-        $move = 'd';
 	fwrite($signal, $move);
 		
 }

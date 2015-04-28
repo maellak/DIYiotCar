@@ -12,7 +12,7 @@ NewPing sonarLeft(TRIGGER_PIN_LEFT, ECHO_PIN_LEFT, MAX_DISTANCE);
 NewPing sonarRight(TRIGGER_PIN_RIGHT, ECHO_PIN_RIGHT, MAX_DISTANCE);
 
 void setup() {
-Serial.begin(115200);
+Serial.begin(9600);
 }
 
 bool carIsRunning=true;

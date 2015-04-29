@@ -2,7 +2,7 @@
 
 		
 		
-function runCar($signal){
+function runCar($signal,$move){
 		
 	echo 'Running!';
 	fwrite($signal, $move);
@@ -18,14 +18,14 @@ function stopCar($dist, $signal,$move){
 }
 		
 		
-function turnLEFT($signal){
+function turnLEFT($signal,$move){
 		   
 	echo 'turn left';
 	fwrite($signal, $move);
 		
 }
 		
-function turnRIGHT($signal){
+function turnRIGHT($signal,$move){
 		
 	echo 'turn right';
 	fwrite($signal, $move);

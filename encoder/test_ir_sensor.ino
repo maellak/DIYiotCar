@@ -4,7 +4,7 @@ int prevActina=0;
 int aktines=5;
 int strofes=0;
 int averageDistance=500;
-
+demooooos
 
 void setup(){
   Serial.begin(9600);

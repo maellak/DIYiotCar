@@ -39,7 +39,7 @@ void loop(){
 /////////////encoder///////////////////////////////////////////
 //////////LEFT///////////////
   int valLeft = analogRead(sensorPinLeft);
-  if ( valLeft<averageDistanceLeft && prevActina>averageDistanceLeft ) 
+  if ( valLeft<averageDistanceLeft && prevActinaLeft>averageDistanceLeft ) 
   {aktinaLeft=1;}
   else
   {aktinaLeft=0;}
@@ -59,7 +59,7 @@ void loop(){
   
 ///////////////RIGHT///////////////
   int valRight = analogRead(sensorPinRight);
-  if ( valRight<averageDistanceRight && prevActina>averageDistanceRight )  
+  if ( valRight<averageDistanceRight && prevActinaRight>averageDistanceRight )  
   {aktinaRight=1;}
   else
   {aktinaRight=0;}
@@ -75,11 +75,6 @@ void loop(){
   */
   //Serial.println(val);
   prevActinaRight=valRight;
-  Serial.print("@");
-  Serial.print(aktinaLeft);
-  Serial.print("*");
-  Serial.print(aktinaRight);
-  Serial.print("#");
 /////////////encoder end/////////////////////////////////
 
 /////////////////////////////////////////////////////////////////
@@ -104,12 +99,18 @@ void loop(){
    distLEFT = round(distance_LEFT);
    distRIGHT = round(distance_RIGHT);
   
+  ///////set protocol//////
+  //////////@distance left*distance center*distance right*ακτινα bit left*ακτινα bit right#///////////////////////// 
   Serial.print("@");
   Serial.print(distLEFT);
   Serial.print("*");
   Serial.print(dist);
   Serial.print("*");
   Serial.print(distRIGHT);
+  Serial.print("*");
+  Serial.print(aktinaLeft);
+  Serial.print("*");
+  Serial.print(aktinaRight);
   Serial.println("#");
 /////////////////////sonar end////////////////////////
   

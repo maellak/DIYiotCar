@@ -54,7 +54,7 @@ void loop(){
   }
   */
   //Serial.println(val);
-  prevActina=valLeft;
+  int prevActina=valLeft;
   
   
 ///////////////RIGHT///////////////

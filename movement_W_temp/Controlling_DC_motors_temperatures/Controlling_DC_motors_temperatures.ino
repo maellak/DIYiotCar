@@ -1,17 +1,17 @@
 #include <OneWire.h>
-
-
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_PWMServoDriver.h"
-//#include <Adafruit_PWMServoDriver.h>
+
 // Setting up Motors on Adafruit Motorshield
 // Left Motor is Motor 4 and Right Motor is Motor 3
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *myMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *myMotor2 = AFMS.getMotor(4);
 OneWire  ds(10);
-#define MOTORSPEED 255 //255 is maximum speed
+#define MOTORSPEED1 250 //255 is maximum speed
+#define MOTORSPEED2 255 //255 is maximum speed
+
 void setup() {
   Serial.begin(9600); // set up Serial library at 9600 bps
   
@@ -60,29 +60,29 @@ void moveForward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   uint8_t i;
   motor->run(FORWARD);
   motor2->run(FORWARD);
-  motor->setSpeed(MOTORSPEED);
-  motor2->setSpeed(MOTORSPEED);
+  motor->setSpeed(MOTORSPEED1);
+  motor2->setSpeed(MOTORSPEED2);
 }
 void moveBackward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   uint8_t i;
   motor->run(BACKWARD);
   motor2->run(BACKWARD);
-  motor->setSpeed(MOTORSPEED);
-  motor2->setSpeed(MOTORSPEED);
+  motor->setSpeed(MOTORSPEED1);
+  motor2->setSpeed(MOTORSPEED2);
 }
 void moveRight(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   uint8_t i;
   motor->run(BACKWARD);
   motor2->run(FORWARD);
-  motor->setSpeed(MOTORSPEED);
-  motor2->setSpeed(MOTORSPEED);
+  motor->setSpeed(MOTORSPEED1);
+  motor2->setSpeed(MOTORSPEED2);
 }
 void moveLeft(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   uint8_t i;
   motor->run(FORWARD);
   motor2->run(BACKWARD);
-  motor->setSpeed(MOTORSPEED);
-  motor2->setSpeed(MOTORSPEED);
+  motor->setSpeed(MOTORSPEED1);
+  motor2->setSpeed(MOTORSPEED2);
 }
 void getTemp() {
   byte i;

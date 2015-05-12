@@ -54,7 +54,10 @@ else{
             $distance_LEFT = $sonar_movement[0];                              
             $distance = $sonar_movement[1];                                   
             $distance_RIGHT = $sonar_movement[2];                             
-                                                                                
+            $leftWheel = $sonar_movement[3];
+            $rightWheel = $sonar_movement[4];                                                 
+            $temp = $sonar_movement[5];
+            
             echo "Left distance:" . $distance_LEFT . "\n";                                            
             echo "Center distance:" .$distance . "\n";                                                 
             echo "Right distance" . $distance_RIGHT . "\n";                                           

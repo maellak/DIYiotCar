@@ -1,0 +1,21 @@
+#!/bin/sh /etc/rc.common
+
+START=60
+
+SERVICE_DAEMONIZE=1
+SERVICE_WRITE_PID=1
+
+
+
+stop() {
+        service_stop /usr/sbin/hostapd
+}
+
+start() {
+export TERM='xterm'
+        service_start /usr/sbin/hostapd -dd /etc/hostapd/hostapd.conf
+        sleep 1
+        ifconfig wlan0 192.168.42.1
+        ifconfig wlan0 netmask 255.255.255.0
+
+}

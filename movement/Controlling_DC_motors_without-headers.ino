@@ -11,7 +11,7 @@
  #define MOTORSPEED 255 //255 is maximum speed
  void setup() {
    Serial.begin(9600); // set up Serial library at 9600 bps
-
+ }
 void loop() {
    uint8_t i;
    if(Serial.available() > 0){
@@ -44,10 +44,8 @@ void loop() {
        myMotor->run(RELEASE);
        myMotor2->run(RELEASE);
      }
-void moveLeft(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
-   motor->setSpeed(MOTORSPEED);
-   motor2->setSpeed(MOTORSPEED);
- }
+   }
+}
 
 void moveForward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   uint8_t i;

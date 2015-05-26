@@ -75,7 +75,7 @@ void loop(){
   }
   */
   //Serial.println(val);
-  int prevActinaLeft=valLeft;
+  prevActinaLeft=valLeft;
   
   
 ///////////////RIGHT wheel///////////////

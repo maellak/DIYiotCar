@@ -57,6 +57,8 @@ void loop(){
     temperature=getTemp();
     //Serial.println(temperature);
   }
+  
+  /////left wheeel//////////
   int valLeft = analogRead(sensorPinLeft);
   if ( valLeft<averageDistanceLeft && prevActinaLeft>averageDistanceLeft ) 
   {aktinaLeft=1;}
@@ -73,10 +75,10 @@ void loop(){
   }
   */
   //Serial.println(val);
-  int prevActina=valLeft;
+  prevActinaLeft=valLeft;
   
   
-///////////////RIGHT///////////////
+///////////////RIGHT wheel///////////////
   int valRight = analogRead(sensorPinRight);
   if ( valRight<averageDistanceRight && prevActinaRight>averageDistanceRight )  
   {aktinaRight=1;}

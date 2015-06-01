@@ -2,30 +2,54 @@
 
 		
 		
-function runCar($signal){
+function runCar($signal,$move){
 		
 	
-	fwrite($signal, $move);
+	myfwrite($signal, $move);
 	echo "Running!\n";	
 }
 		
-function stopCar($dist, $signal,$move){
+function stopCar( $signal,$move){
 	
-	findObject($dist);
-	fwrite($signal, $move);
+	
+	myfwrite($signal, 'q');
+	sleep(0.1);
+	myfwrite($signal, $move);
 	echo "Car stop!\n"; 
 }
-		
+
+function myfwrite(&$signal,$move){
+
+	if ($signal == NULL || is_string($signal) ) {
+
+		$signal = fopen("/dev/ttymotor", "w");
+		echo shell_exec("sh /root/admin/resetusbarduino.sh");
+
+		# code...
+	}
+
+	return fwrite($signal,$move);
+
+
+}
+	
+function brakeCar($signal,$move){
+
+	
+	myfwrite($signal, $move);
+	echo "Brake stop!\n"; 
+
+}	
 		
 function turnLEFT($signal){
 		   
-	fwrite($signal, $move);
+	myfwrite($signal, $move);
 	echo "turn left\n";	
 }
 		
 function turnRIGHT($signal){
 		
-	fwrite($signal, $move);
+	myfwrite($signal, $move);
 	echo "turn right\n";
 }
 		
@@ -43,7 +67,7 @@ function findObject( $dist ){
 		
 function noObject(){
 		
-	echo "No object, keep moving :)";
+	echo "No object, keep moving :)\n";
 }
 
 

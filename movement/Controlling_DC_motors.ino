@@ -5,8 +5,8 @@
 // Setting up Motors on Adafruit Motorshield
 // Left Motor is Motor 4 and Right Motor is Motor 3
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_DCMotor *myMotor = AFMS.getMotor(3);
-Adafruit_DCMotor *myMotor2 = AFMS.getMotor(4);
+Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
+Adafruit_DCMotor *myMotor2 = AFMS.getMotor(2);
 
 int motorspeedRight = 255;
 int motorspeedLeft = 252;

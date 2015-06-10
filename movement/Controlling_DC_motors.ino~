@@ -85,7 +85,6 @@ void loop() {
       moveRight(myMotor, myMotor2);
     }
 
-    //break!!
     else if(directionsData.startsWith("q")){
       Serial.println("Stop");
       myMotor->run(RELEASE);
@@ -93,7 +92,7 @@ void loop() {
     }
   }
 }
-//moving functions
+
 void moveForward(Adafruit_DCMotor *motor, Adafruit_DCMotor *motor2){
   motor->run(FORWARD);
   motor2->run(FORWARD);

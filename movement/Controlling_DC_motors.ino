@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
+#include <QueueArray.h>
 
 
 // Setting up Motors on Adafruit Motorshield
@@ -14,7 +15,7 @@ int motorspeedLeft = 252;
 
 void setup() {
   Serial.begin(9600); // set up Serial library at 9600 bps
-AFMS.begin();
+  AFMS.begin();
   //in the beginng start/stop the motors
   myMotor->setSpeed(0);
   myMotor->run(FORWARD);
@@ -27,69 +28,108 @@ AFMS.begin();
 }
 
 
+   String command;
+   int commandIndex;
+   QueueArray  <String> stack;
 void loop() {
-  
+  String *allcomands;
   if(Serial.available() > 0){
-   
+       
     //read direction & speed from serial then print direction and/or speed
     String directionsData = Serial.readString();
-    Serial.println(directionsData);
-   
-    if(directionsData.startsWith("w")){
-      Serial.println("Forward ");
-      
-     //forward speed assign
-      if(directionsData.length() > 1){
-        Serial.println("motorspeed");
-      //essential little fix because motors differentiate on speed
-      motorspeedRight = directionsData.substring(1,4).toInt();
-      motorspeedLeft = directionsData.substring(5,8).toInt() - 3;
-      }
+    //Serial.println(directionsData);
+    commandIndex=0;
+    command="";
+     //Serial.print("@");
+     //Serial.print( directionsData.indexOf("@") );
+     //Serial.print("#");
+     //Serial.println( directionsData.indexOf("#") );
+     //Serial.println( directionsData.substring( directionsData.indexOf("#")+1,directionsData.length() ) );
+   while( ( directionsData.indexOf("@")>=0 && directionsData.indexOf("#")>=0 ) && (directionsData.indexOf("@")<directionsData.indexOf("#")) && (directionsData.length()>0) )
+   {
+     command=directionsData.substring( directionsData.indexOf("@")+1,directionsData.indexOf("#") );
+     directionsData=directionsData.substring( directionsData.indexOf("#")+1,directionsData.length() );
      
-      moveForward(myMotor, myMotor2);
-    } 
-    else if (directionsData.startsWith("s")){
-      Serial.println("Backward ");
-      
-     //backward speed assign
-      if(directionsData.length() > 1){
-        Serial.println("motorspeed");
-      motorspeedRight = directionsData.substring(1,4).toInt();
-      motorspeedLeft = directionsData.substring(5,8).toInt() - 3;
+     Serial.println(command);
+     stack.enqueue(command);
+     commandIndex++;
+   }
+   int apoklisi=3;
+   while (!stack.isEmpty ())
+   {
+       directionsData=stack.dequeue();
+      if(directionsData.startsWith("w")){
+        Serial.println("Forward ");
+        
+       //forward speed assign
+        if(directionsData.length() > 1){
+          Serial.println("motorspeed");
+        //essential little fix because motors differentiate on speed
+        motorspeedRight = directionsData.substring(1,4).toInt();
+        motorspeedLeft = directionsData.substring(5,8).toInt()-apoklisi;
+        }
+          Serial.print("l");
+          Serial.print(motorspeedRight);
+          Serial.print("r");
+          Serial.println(motorspeedLeft);
+       
+        moveForward(myMotor, myMotor2);
+      } 
+      else if (directionsData.startsWith("s")){
+        Serial.println("Backward ");
+        
+       //backward speed assign
+        if(directionsData.length() > 1){
+          Serial.println("motorspeed");
+        motorspeedRight = directionsData.substring(1,4).toInt();
+        motorspeedLeft = directionsData.substring(5,8).toInt() - apoklisi;
+        }
+          Serial.print("l");
+          Serial.print(motorspeedRight);
+          Serial.print("r");
+          Serial.println(motorspeedLeft);
+       
+        moveBackward(myMotor, myMotor2);
+      } 
+      else if (directionsData.startsWith("a")){
+        Serial.println("Left");
+       
+       //left speed assign
+        if(directionsData.length() > 1){
+          Serial.println("motorspeed");
+        motorspeedRight = directionsData.substring(1,4).toInt();
+        motorspeedLeft = directionsData.substring(5,8).toInt() - apoklisi;
+        }
+          Serial.print("l");
+          Serial.print(motorspeedRight);
+          Serial.print("r");
+          Serial.println(motorspeedLeft);
+        
+        moveLeft(myMotor, myMotor2);
+      } 
+      else if (directionsData.startsWith("d")){
+        Serial.println("Right");
+        
+       //right speed assign
+        if(directionsData.length() > 1){
+          Serial.println("motorspeed");
+        motorspeedRight = directionsData.substring(1,4).toInt();
+        motorspeedLeft = directionsData.substring(5,8).toInt() - apoklisi;
+        }
+          Serial.print("l");
+          Serial.print(motorspeedRight);
+          Serial.print("r");
+          Serial.println(motorspeedLeft);
+             
+        moveRight(myMotor, myMotor2);
       }
-     
-      moveBackward(myMotor, myMotor2);
-    } 
-    else if (directionsData.startsWith("a")){
-      Serial.println("Left");
-     
-     //left speed assign
-      if(directionsData.length() > 1){
-        Serial.println("motorspeed");
-      motorspeedRight = directionsData.substring(1,4).toInt();
-      motorspeedLeft = directionsData.substring(5,8).toInt() - 3;
+  
+      //break!!
+      else if(directionsData.startsWith("q")){
+        Serial.println("Stop");
+        myMotor->run(RELEASE);
+        myMotor2->run(RELEASE);
       }
-      
-      moveLeft(myMotor, myMotor2);
-    } 
-    else if (directionsData.startsWith("d")){
-      Serial.println("Right");
-      
-     //right speed assign
-      if(directionsData.length() > 1){
-        Serial.println("motorspeed");
-      motorspeedRight = directionsData.substring(1,4).toInt();
-      motorspeedLeft = directionsData.substring(5,8).toInt() - 3;
-      }
-           
-      moveRight(myMotor, myMotor2);
-    }
-
-    //break!!
-    else if(directionsData.startsWith("q")){
-      Serial.println("Stop");
-      myMotor->run(RELEASE);
-      myMotor2->run(RELEASE);
     }
   }
 }

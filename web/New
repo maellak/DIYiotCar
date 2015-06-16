@@ -19,7 +19,7 @@
         };
       })();
 
-      function drawRect(x,y, context) {
+      function drawRect(x,y, context,rotate) {
      	 context.beginPath();
       	context.arc(x, y, radius, 0, 2 * Math.PI, false);
       context.fillStyle = 'green';
@@ -28,14 +28,21 @@
       context.strokeStyle = '#003300';
       context.stroke();
       context.beginPath();
-      context.arc(x-(radius/2), y-(radius/2), radius*0.1, 0, 2 * Math.PI, false);
+//rotate=90;
+rotate=(360-rotate)+90;
+eyeDegree=30;
+radiansLeft = (rotate-eyeDegree) * (Math.PI/180);
+radiansRight = (rotate+eyeDegree) * (Math.PI/180);
+//console.log(x+" x "+y);
+//console.log(Math.sin(radians)*(radius/2)+" x "+Math.cos(radians)*(radius/2));
+      context.arc(x +Math.sin(radiansLeft)*(radius*0.8),y - Math.cos(radiansLeft)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
       context.fillStyle = 'red';
       context.fill();
       context.lineWidth = border;
       context.strokeStyle = '#900';
       context.stroke();
       context.beginPath();
-        context.arc(x+(radius/2), y-(radius/2), radius*0.1, 0, 2 * Math.PI, false);
+      context.arc(x +Math.sin(radiansRight)*(radius*0.8),y - Math.cos(radiansRight)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
       context.fillStyle = 'red';
       context.fill();
       context.lineWidth = border;
@@ -66,10 +73,12 @@
 
           // clear
           context.clearRect(0, 0, canvas.width, canvas.height);
-console.log(currentX+"x"+currentY);
-
+//console.log(currentX+"x"+currentY);
+direction = Math.atan2(gotoY-currentY,  gotoX-currentX) / Math.PI * 180;
+console.log(direction);
+rotate = direction;
           // draw
-          drawRect(currentX,currentY, context);
+          drawRect(currentX,currentY, context,rotate);
 
           // request new frame
 if (Math.abs(gotoX-currentX)>2 && Math.abs(gotoY-currentY)>2)
@@ -108,9 +117,9 @@ if (Math.abs(gotoX-currentX)>2 && Math.abs(gotoY-currentY)>2)
       document.getElementById('myCanvas').addEventListener('mousedown', function(event) {
         // flip flag
         //runAnimation.value = !runAnimation.value;
-        console.log(event.clientX+' x '+event.clientY);
-	console.log("xy:"+x+" x "+y);
-	console.log("current:"+currentX+" x "+currentY);
+        //console.log(event.clientX+' x '+event.clientY);
+	//console.log("xy:"+x+" x "+y);
+	//console.log("current:"+currentX+" x "+currentY);
         gotoX = event.clientX;
         gotoY = event.clientY;
 if(gotoX>(canvas.width - radius - border)) gotoX=canvas.width - radius - border;
@@ -124,7 +133,7 @@ if(gotoY<0) gotoY=radius + border;
           animate(time, currentX,currentY, runAnimation, canvas, context);
         
       });
-      drawRect(centerX,centerY, context);
+      drawRect(centerX,centerY, context,0);
 
     </script>
   </body>

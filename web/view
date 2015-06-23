@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <canvas id="myCanvas" width="400" height="800"></canvas>
+    <canvas id="myCanvas" width="1340" height="800"></canvas>
     <script>
       window.requestAnimFrame = (function(callback) {
         return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
@@ -28,21 +28,18 @@
       context.strokeStyle = '#003300';
       context.stroke();
       context.beginPath();
-//rotate=90;
 rotate=(360-rotate)+90;
 eyeDegree=30;
 radiansLeft = (rotate-eyeDegree) * (Math.PI/180);
 radiansRight = (rotate+eyeDegree) * (Math.PI/180);
-//console.log(x+" x "+y);
-//console.log(Math.sin(radians)*(radius/2)+" x "+Math.cos(radians)*(radius/2));
-      context.arc(x +Math.sin(radiansLeft)*(radius*0.8),y - Math.cos(radiansLeft)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
+      context.arc(x +Math.sin(radiansLeft)*(radius*0.8),y + Math.cos(radiansLeft)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
       context.fillStyle = 'red';
       context.fill();
       context.lineWidth = border;
       context.strokeStyle = '#900';
       context.stroke();
       context.beginPath();
-      context.arc(x +Math.sin(radiansRight)*(radius*0.8),y - Math.cos(radiansRight)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
+      context.arc(x +Math.sin(radiansRight)*(radius*0.8),y + Math.cos(radiansRight)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
       context.fillStyle = 'red';
       context.fill();
       context.lineWidth = border;

@@ -1,0 +1,3 @@
+sudo deborphan -e lo-menubar | xargs sudo apt-get -y remove --purge
+sleep 5
+sudo dpkg --purge `dpkg -l | egrep "^rc" | cut -d ' ' -f3`

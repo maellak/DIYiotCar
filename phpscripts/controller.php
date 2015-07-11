@@ -144,8 +144,8 @@ function backward()
 	}
 }
 
-//function for left
-function left()
+//function for left - DEPRECATED
+/*function left()
 {
 	global $serial;
 
@@ -166,7 +166,7 @@ function left()
 	}
 }
 
-//function for right
+//function for right - DEPRECATED
 function right()
 {
 	global $serial;
@@ -186,7 +186,7 @@ function right()
 		$serial->sendMessage($exec);
 		$serial->deviceClose();
 	}
-}
+}*/
 
 //function for rotation                                
 function rotateLeft($m){                    
@@ -211,7 +211,7 @@ function rotateLeft($m){
         $curM = 0;                                  
         $prevLeftWheel = 0;                         
         while($curM < $m) {
-var_dump($curM.' '.$DIYleftWheel.' '.$DIYleftWheel);
+//var_dump($curM.' '.$DIYleftWheel.' '.$DIYleftWheel);
                 if($prevLeftWheel != $DIYleftWheel && $DIYleftWheel == 1) {
                         $curM = $curM + $palmos;                           
                 }                                                          

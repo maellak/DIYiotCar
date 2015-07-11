@@ -1,0 +1,94 @@
+<?php                                                                                                            
+                                                                                                                 
+require_once("/root/admin/position.php");
+                                                                                       
+//$DIYpipecloud = fopen("/root/arduinocloud",'r+');
+                                                                     
+// write data cloud                                                                            
+if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){            
+	echo "Cannot link with sonar, wrong usb connected";                    
+	exit;                                                                   
+}                                                                               
+
+// read sonar adata                                                                            
+if (!$sensors = fopen("/dev/ttysonar", "r")){            
+	echo "Cannot link with sonar, wrong usb connected";                    
+	exit;                                                                   
+}                                                                               
+                                              
+//open motor for write                                                                                
+if (!$DIYmotors = fopen("/dev/ttymotor", "w")){           
+	echo "Cannot link with motors, wrong usb connected";                       
+	exit;                                                                     
+}                                                                               
+
+function writeCloud($data){
+	$p=$GLOBALS['DIYpipecloud'];
+	fwrite($p, $data."\n");
+}
+                                                                            
+function forward()
+{
+	registerMove('w');
+	$p=$GLOBALS['DIYmotors'];
+	fwrite($p, 'w');
+	//return shell_exec('echo "w" > /dev/ttymotor');
+}
+
+function backward()
+{
+	registerMove('s');
+	$p=$GLOBALS['DIYmotors'];
+	fwrite($p, 's');
+	//return shell_exec('echo "s" > /dev/ttymotor');
+}
+function left()
+{
+	registerMove('a');
+	$p=$GLOBALS['DIYmotors'];
+	fwrite($p, 'a');
+	//return shell_exec('echo "a" > /dev/ttymotor');
+}
+function right()
+{
+	registerMove('d');
+	$p=$GLOBALS['DIYmotors'];
+	fwrite($p, 'd');
+	//return shell_exec('echo "w" > /dev/ttymotor');
+}
+function stop()
+{
+	registerMove('q');
+	$p=$GLOBALS['DIYmotors'];
+	fwrite($p, 'q');
+	//return shell_exec('echo "q" > /dev/ttymotor');
+}
+
+
+                                                                                
+                                                                      
+while ( ($buffer = trim(fgets($sensors, 4096))) !== false    ) {    
+                                        
+	if ( trim($buffer)=="" ){
+              continue;
+	}                   
+	writeCloud($buffer);
+
+	$sonar_raw = substr($buffer, 1 , strlen($buffer) - 2 );   //echo $sonar_raw;       
+	$sonar_movement = explode('*', $buffer);             // echo $sonar_movement;                                                
+                                                                                                        
+	$DIYdistance_LEFT = $sonar_movement[0];                              
+	$DIYdistance = $sonar_movement[1];                                   
+	$DIYdistance_RIGHT = $sonar_movement[2];                             
+	$DIYleftWheel = $sonar_movement[3];
+	$DIYrightWheel = $sonar_movement[4];                                                 
+	$DIYtemperature = $sonar_movement[5];
+	    
+	carscript();
+
+}
+
+
+
+
+

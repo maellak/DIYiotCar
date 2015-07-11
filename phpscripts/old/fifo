@@ -1,0 +1,9 @@
+<?php
+$fifo="/root/x";
+ $fh=fopen($fifo, "r+"); // ensures at least one writer (us) so will be non-blocking
+  stream_set_blocking($fh, false); // prevent fread / fwrite blocking
+while (true)
+{
+  $data = fread($fh,1024);
+         echo $data;
+}

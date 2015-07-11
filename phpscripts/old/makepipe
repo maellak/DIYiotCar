@@ -1,0 +1,1 @@
+socat -u tcp-l:50044,fork,reuseaddr system:tee /root/x > /dev/null

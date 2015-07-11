@@ -1,0 +1,33 @@
+
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option hwmode '11g'
+	option path 'platform/bcm2708_usb/usb1/1-1/1-1.2/1-1.2.4/1-1.2.4:1.0'
+	option htmode 'HT20'
+	option channel '4'
+	option txpower '20'
+	option country 'GR'
+
+config wifi-iface
+	option device 'radio0'
+	option ssid 'OpenWrt'
+	option encryption 'none'
+	option network 'lan'
+	option mode 'ap'
+
+config wifi-device 'radio1'
+	option type 'mac80211'
+	option path 'platform/bcm2708_usb/usb1/1-1/1-1.2/1-1.2:1.0'
+	option htmode 'HT20'
+	option disabled '0'
+	option channel '6'
+	option txpower '20'
+	option country '00'
+
+config wifi-iface
+	option ssid 'carWIFI'
+	option encryption 'none'
+	option device 'radio1'
+	option mode 'sta'
+	option bssid '00:1B:2F:CE:1B:02'
+	option network 'wwan'

@@ -380,10 +380,11 @@ function refreshDIYData($sensors) {
                                                                                                                                   
         $DIYdistance_LEFT = trim($sonar_movement[0]);                                                                             
         $DIYdistance = trim($sonar_movement[1]);                                                                                  
-        $DIYdistance_RIGHT = trim($sonar_movement[2]);                                                                            
-        $DIYleftWheel = trim($sonar_movement[3]);                                                                                 
-        $DIYrightWheel = trim($sonar_movement[4]);                                                                                
-        $DIYtemperature = trim($sonar_movement[5]);     
+        $DIYdistance_RIGHT = trim($sonar_movement[2]);  
+        $DIYdistance_DOWN = trim($sonar_movement[3]);
+        $DIYleftWheel = trim($sonar_movement[4]);                                                                                 
+        $DIYrightWheel = trim($sonar_movement[5]);                                                                                
+        $DIYtemperature = trim($sonar_movement[6]);     
 }
 
 

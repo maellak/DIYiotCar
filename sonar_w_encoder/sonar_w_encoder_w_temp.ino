@@ -8,16 +8,21 @@
 #define ECHO_PIN_LEFT 9
 #define TRIGGER_PIN_RIGHT 8
 #define ECHO_PIN_RIGHT 7
+#define TRIGGER_PIN_DOWN 5
+#define ECHO_PIN_DOWN 6
 #define MAX_DISTANCE 200
 NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
 NewPing sonarLeft(TRIGGER_PIN_LEFT, ECHO_PIN_LEFT, MAX_DISTANCE);
 NewPing sonarRight(TRIGGER_PIN_RIGHT, ECHO_PIN_RIGHT, MAX_DISTANCE);
+NewPing sonarDown(TRIGGER_PIN_DOWN, ECHO_PIN_DOWN, MAX_DISTANCE);
 float distance;
 float distance_LEFT;
 float distance_RIGHT;
+float distance_DOWN;
 float allDistances[]={0,0,0,0,0};
 float allDistancesRight[]={0,0,0,0,0};
 float allDistancesLeft[]={0,0,0,0,0};
+float allDistancesDown[]={0,0,0,0,0};
 /////////end sonar parameters///////////
 
 /////encoder parameters///////////
@@ -107,16 +112,20 @@ void loop(){
   int uS = sonar.ping();
   int uS_LEFT = sonarLeft.ping();
   int uS_RIGHT = sonarRight.ping();
+  int uS_DOWN = sonarDown.ping();
   float distance=uS / US_ROUNDTRIP_CM;
   float distance_LEFT=uS_LEFT / US_ROUNDTRIP_CM;
   float distance_RIGHT=uS_RIGHT / US_ROUNDTRIP_CM;
+  float distance_DOWN=uS_DOWN / US_ROUNDTRIP_CM;
   int dist;
   int distLEFT;
   int distRIGHT;
+  int distDOWN;
   
    dist = round(distance);
    distLEFT = round(distance_LEFT);
    distRIGHT = round(distance_RIGHT);
+   distDOWN = round(distance_DOWN);
   
   ///////set protocol//////
   //////////@distance left*distance center*distance right*ακτινα bit left*ακτινα bit right#///////////////////////// 
@@ -128,12 +137,15 @@ void loop(){
   Serial.print("*");
   Serial.print(distRIGHT);
   Serial.print("*");
+  Serial.print(distDOWN);
+  Serial.print("*");
   Serial.print(aktinaLeft);
   Serial.print("*");
   Serial.print(aktinaRight);
   Serial.print("*");
   Serial.print(temperature);
   Serial.println("#");
+
   
 /////////////////////sonar end////////////////////////
 }

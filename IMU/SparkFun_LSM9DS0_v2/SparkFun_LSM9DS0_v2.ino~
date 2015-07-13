@@ -84,10 +84,10 @@ void loop()
   axcf = axcf/i;
   aycf = aycf/i;
   azcf = azcf/i;
-//  Serial.print("Final axcf=");
-//  Serial.println(axcf);
-//  Serial.println(aycf);
-//  Serial.println(azcf);
+  Serial.print("Final axcf=");
+  Serial.println(axcf);
+  Serial.println(aycf);
+  Serial.println(azcf);
    
   
    
@@ -104,7 +104,7 @@ void loop()
   Serial.print('*');
   calcuMag();             // Calculate "M: mx, my, mz"
   printHeading(mx, my, mz);   // Print Heading - works only in if the sensor is flat (z-axis normal to Earth).
-  Serial.print('*');
+  Serial.println('#');
  
   
   R_y = a_ngl_e (ax,ay,az,0);
@@ -112,19 +112,16 @@ void loop()
   
 
 
-  //Serial.print("Degrees Y - AXIS: ");
+  Serial.print("Degrees Y - AXIS: ");
   Serial.print(R_y);
-  Serial.print('*');
-  Serial.print(R_y);
-  Serial.println('#');
-  //Serial.println();
+  Serial.println();
 
   
   
-  //Serial.print("Degrees X - AXIS: ");
-  //Serial.print(R_x);
-  //Serial.println();
-  //Serial.println(); 
+  Serial.print("Degrees X - AXIS: ");
+  Serial.print(R_x);
+  Serial.println();
+  Serial.println(); 
 
   
   delay(PRINT_SPEED);
@@ -352,4 +349,3 @@ float a_ngl_e (float Ax, float Ay, float Az, byte AA)
   return Real;
 } 
   
-

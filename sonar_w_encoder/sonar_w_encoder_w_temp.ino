@@ -143,8 +143,6 @@ void loop(){
  Serial.print("*");
  Serial.print(aktinaRight);
  Serial.print("*");
- Serial.println();
- 
  Serial.print(temperature);
  Serial.println("#");
 

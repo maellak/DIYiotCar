@@ -1,4 +1,5 @@
 <?php
+// 0 3
 $curMove = '0';
 $direction = 90;
 $posx = 0;
@@ -9,13 +10,9 @@ define ('DEGREES_BETWEEN_DOTS', 72);
 define('CAR_WHEEL_RADIUS', 3);
 define('BOUNDARY_X', 101);
 define('BOUNDARY_Y', 101);
-define('OBSTACLE', 10);
+define('OBSTACLE', 12);
+define('GROUND_DISTANCE', 4);
 $carIsRunning=TRUE;
-
-function registerMove($movement) {
-	global $curMove;
-	$curMove = $movement;
-}
 
 function recalculateCoordinates() {
 	global $curMove, $direction;
@@ -39,54 +36,55 @@ $prevDIYLeftWheel = 0;
 // Default movement and obstacle detection logic
 function movementLogic() {
 
-	global $posx, $posy, $curMove, $direction, $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $carIsRunning;
+	global $posx, $posy,$serial,
+ $curMove, $direction, $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $carIsRunning;
 	echo "logic";
 	echo $carIsRunning;
-
 		if ( $carIsRunning ) {
-
 			echo " forward ";
-			forward();
-
-			/*if (  ( !($DIYdistance_RIGHT < OBSTACLE) || !($DIYdistance_LEFT < OBSTACLE) || !($DIYdistance < OBSTACLE) ) && ( ($curMove != 's') || ($curMove != 'a') || ($curMove != 'd') ) ){
-				
-				forward();
+			if (  ( $DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE && $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
+                forward();
 				echo "empros\n";
 				$carIsRunning = TRUE;
-
-			}elseif (($curMove != 'a') && ($DIYdistance_LEFT > $DIYdistance_RIGHT)){
-				
-				left();
+			}  
+/*            
+            elseif (($curMove != 'a') && ($DIYdistance_LEFT > $DIYdistance_RIGHT) && ($DIYdistance_LEFT > OBSTACLE)){ 
+				rotateLeft(64);//left(); 
+                //stop();
 				echo "aristera\n";
 				$carIsRunning = TRUE;
 
-			}elseif (($curMove != 'd') && ($DIYdistance_LEFT < $DIYdistance_RIGHT)){
-				
-				right();
+			}
+            elseif (($curMove != 'd') && ($DIYdistance_LEFT < $DIYdistance_RIGHT) && ($DIYdistance_RIGHT > OBSTACLE)){ 
+				rotateRight(64);//right();
+                //stop();
 				echo "dexia\n";
 				$carIsRunning = TRUE;
 
-			}elseif ( ($DIYdistance_RIGHT < OBSTACLE) && ($DIYdistance_LEFT < OBSTACLE) && ($DIYdistance < OBSTACLE) ) {
-				
+			}
+           
+        elseif ( ($DIYdistance_RIGHT <= OBSTACLE) && ($DIYdistance_LEFT <= OBSTACLE) && ($DIYdistance <= OBSTACLE) ) {				
 				stop();
 				echo "stop\n";
 				$carIsRunning = false;
-			}
+			}  */
 			else{ 
-
 				forward();
 				echo "piso\n";
-				$carIsRunning = TRUE;
-			}*/
+        $exec='@q#';
+		$serial->deviceOpen();
+		$serial->sendMessage($exec);
+        $serial->deviceClose();
+            break;
+				$carIsRunning = FALSE;
+			}
 
 			
 		}else{
-
-			stop();
+			//stop();
 			echo "Stops from position.php";
 			$carIsRunning = TRUE;
 		}
-
 	
 }
 

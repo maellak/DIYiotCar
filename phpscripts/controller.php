@@ -4,7 +4,7 @@
 include "/root/phpscripts/PHP-Serial/src/PhpSerial.php";
 
 //set tty
-exec("/root/admin/resettty.sh");
+//exec("/root/admin/resettty.sh");
                                                                                                                  
 // ************************************************
 // ***************** GLOBALS **********************
@@ -32,6 +32,7 @@ $DIYrodastop="060";
 // ************************************************
 
 // vriski tin thessi tou auto
+require_once("/root/phpscripts/functions.php");
 require_once("/root/phpscripts/position.php");
                                                                                        
 
@@ -50,7 +51,18 @@ require_once("/root/phpscripts/position.php");
 	$serial->confCharacterLength(8);
 	$serial->confStopBits(1);
 	$serial->confFlowControl("none");
-
+    /*
+        $exec='@w'.$rodal.':'.$rodar.'#';
+		$serial->deviceOpen();
+		$serial->sendMessage("@w080:080#");
+		$serial->deviceClose(); 
+    sleep(5);
+    $serial->deviceOpen();
+		$serial->sendMessage("@q#");
+		$serial->deviceClose();
+        sleep(5);
+    die;
+   */
 
 
 // fopen for write data cloud                                                                            
@@ -63,286 +75,14 @@ if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){
 if (!$sensors = fopen("/dev/ttysonar", "r")){            
 	echo "Cannot link with sonar, wrong usb connected";                    
 	exit;                                                                   
-}                                                                               
-                                              
+}        
 
-// ************************************************
-// ***************** function cloud *********
-// ************************************************
-
-//function for write data cloud
-function writeCloud(){
-       	//DIYmove       w,s,a,r                               
-       	//DIYdirection  moires                                           
-       	//DIYposx       x thessi               
-       	//DIYposy       y thessi                              
-       	$DIYmove = trim($GLOBALS['curMove']);         
-       	$DIYdirection = trim($GLOBALS['direction']);
-       	$DIYposx = trim($GLOBALS['posx']);
-       	$DIYposy = trim($GLOBALS['posy']);
-       	$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy#";
-       	$DIYcloud .= "\n";    
-	$p=$GLOBALS['DIYpipecloud'];
-	fwrite($p, $DIYcloud."\n");
-}
-
-// ************************************************
-// ***************** function motion move *********
-// ************************************************
-
-//function for forward 
-function forward()
-{
-	global $serial, $DIRECTION;
-
-	// stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-	$curmove = findregisterMove();
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curmove)
-	if($curmove != 0){
-		echo "allagfhgfhgfhgfhgfhgf $curmove ";
-		stopBeforeCD('w', $curmove);
-	}
-
-	$DIRECTION='w';
-
-	if($curmove != 'w'){
-		registerMove('w');
-
-		$rodal = $GLOBALS['DIYrodal'];
-		$rodar = $GLOBALS['DIYrodar'];
-		$exec='@w'.$rodal.':'.$rodar.'#';
-
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
-
-}
-
-//function for backward
-function backward()
-{
-	global $serial, $DIRECTION;
-
-	// stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-	$curmove = findregisterMove();
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curmove)
-	stopBeforeCD('s', $curmove);
-	$DIRECTION='s';
-
-	if($curmove != 's'){
-		echo "backkkkkkkkkkkkk";
-		registerMove('s');
-
-		$rodal = $GLOBALS['DIYrodal'];
-		$rodar = $GLOBALS['DIYrodar'];
-		$exec="@s$rodal:$rodar#";
-
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
-}
-
-//function for left - DEPRECATED
-/*function left()
-{
-	global $serial;
-
-	// stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-	$curmove = findregisterMove();
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curmove)
-	stopBeforeCD('a', $curmove);
-
-	if($curmove != 'a'){
-		registerMove('a');
-
-		$rodarotation = $GLOBALS['DIYrodarotation'];
-		$exec="@a$rodarotation:$rodarotation#";
-
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
-}
-
-//function for right - DEPRECATED
-function right()
-{
-	global $serial;
-
-	// stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-	$curmove = findregisterMove();
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curmove)
-	stopBeforeCD('d', $curmove);
-
-	if($curmove != 'd'){
-		registerMove('d');
-
-		$rodarotation = $GLOBALS['DIYrodarotation'];
-		$exec="@d$rodarotation:$rodarotation#";
-
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
-}*/
-
-//function for rotation                                
-function rotateLeft($m){                    
-        global $serial, $DIYleftWheel, $sensors;      
-        $palmos = 32;                       
-                                       
-        // stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-        $curmove = findregisterMove();                                           
-        if( $curmove != 'a' ){                                                   
-                stopBeforeCD('a',$curmove);                                          
-        }                                                                        
-                                                                                 
-        registerMove('a');                                                       
-                                                                                 
-        $rodarotation = $GLOBALS['DIYrodarotation'];                             
-        $exec="@a$rodarotation:$rodarotation#";     
-                                                    
-        $serial->deviceOpen();                      
-        $serial->sendMessage($exec);                
-        $serial->deviceClose();                     
-                                                    
-        $curM = 0;                                  
-        $prevLeftWheel = 0;                         
-        while($curM < $m) {
-//var_dump($curM.' '.$DIYleftWheel.' '.$DIYleftWheel);
-                if($prevLeftWheel != $DIYleftWheel && $DIYleftWheel == 1) {
-                        $curM = $curM + $palmos;                           
-                }                                                          
-                $prevLeftWheel = $DIYleftWheel;                           
-		refreshDIYData($sensors); 
-        }                                                                  
-                                                                           
-        // Send stop                                                       
-        stop();                                                            
-}   
-
-function rotateRight($m){                                                        
-        global $serial, $DIYleftWheel, $sensors;                                           
-        $palmos = 32;                                                            
-                                                                                 
-        // stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo
-        $curmove = findregisterMove();                                           
-        if( $curmove != 'd' ){                                                   
-                stopBeforeCD('d',$curmove);                                          
-        }                                                                        
-                                                                                 
-        registerMove('d');                                                       
-                                                                                 
-        $rodarotation = $GLOBALS['DIYrodarotation'];                             
-        $exec="@d$rodarotation:$rodarotation#";                                  
-                                                                                 
-        $serial->deviceOpen();                                                   
-        $serial->sendMessage($exec);                                             
-        $serial->deviceClose();                                                  
-                                                                                 
-        $curM = 0;                                                               
-        $prevLeftWheel = 0;                                                     
-        while($curM < $m) {                                                      
-                if($prevLeftWheel != $DIYleftWheel && $DIYleftWheel == 1) {      
-                        $curM = $curM + $palmos;                                 
-                }                                                                
-                $prevLeftWheel = $DIYleftWheel;                                  
-		refreshDIYData($sensors);
-        }                                                                        
-                                                                                 
-        // Send stop                                                             
-        stop();                                                                  
+/*
+if (!$imu = fopen("/dev/ttyimu", "r")){            
+	echo "Cannot link with imu, wrong usb connected";                    
+	exit;                                                                   
 }  
-
-
-//function for stop
-function stop()
-{
-	global $serial, $DIYleftWheel, $sensors;
-
-
-	//chamilonoume tachitita
-	$rodastop = $GLOBALS['DIYrodastop'];
-
-	$curmove = findregisterMove();
-	if( $curmove == 'w' ){
-		echo "chamilono tachitita w$rodastop:$rodastop ";
-		$exec='@w'.$rodastop.':'.$rodastop.'#';
- 	}elseif( $curmove == 's'){
-		echo "chamilono tachitita s$rodastop:$rodastop ";
-		$exec="@s$rodastop:$rodastop#";
-	}elseif( $curmove == 'a'){
-		echo "chamilono tachitita a$rodastop:$rodastop ";
-		$exec="@a$rodastop:$rodastop#";
-	}elseif( $curmove == 'd'){
-		echo "chamilono tachitita d$rodastop:$rodastop ";
-		$exec="@d$rodastop:$rodastop#";
-	}
-
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	
-	echo $DIYleftWheel;
-	echo " sssssssssssssssssssdsdsdfgdfghgfhgfhjfgf\n";
-
-	if($curmove != 'q' || $curmove != '0'){
-		while($DIYleftWheel == 0){sleep(0.5); echo 'sleeping...'."\n"; refreshDIYData($sensors);}
-			registerMove('q');
-			echo " parking ";
-			$exec="@q#";
-			$serial->deviceOpen();
-			$serial->sendMessage($exec);
-			$serial->deviceClose();
-	}
-
-}
-
-// ************************************************
-// **************** help functions        *********
-// ************************************************
-
-// dosse tin direction tou auto empros opisthen aristera dexia
-function findregisterMove()
-{
-	global $curMove;
-	if($curMove == 'w'){
-		$curmove = 'w';
-	}elseif($curMove == 's'){
-		$curmove = 's';
-	}elseif($curMove == 'a'){
-		$curmove = 'a';
-	}elseif($curMove == 'd'){
-		$curmove = 'd';
-	}elseif($curMove == 'q'){
-		$curmove = 'q';
-	}elseif($curMove == '0'){
-		$curmove = '0';
-	}
-
-	return $curmove;
-}
-
-// stamata ston palmo prin allaxis katefthinsi
-//function stopBeforeCD(directionpouthelo, aftopoukaneitora)
-function stopBeforeCD($d, $m)
-{
-	$curmove=$m;
-        if( $d == 'w' && $curmove != 'w' ){          
-                stop();              
-        }elseif( $d == 's' && $curmove != 's'){     
-		echo " stopallagis ";
-                stop();              
-        }elseif( $d == 'a' && $curmove != 'a'){     
-                stop();              
-        }elseif( $d == 'd' && $curmove != 'd'){     
-                stop();              
-        }  
-}
-
-
+  */                                                                     
 
 // ************************************************
 // ***************** function shutown  *************
@@ -357,22 +97,36 @@ function shutdown()
 
                                                                                 
 
-
-function refreshDIYData($sensors) {
-	global $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature;
-
+        /*
+        //imu x y z gyro(n/s) moires
+        */
+function refreshDIYData($sensors){ //,$imu) {
+	global $DIYdistance_LEFT, $DIYdistance,$DIYdistance_DOWN, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature;
+    //global $IMUx,$IMUy,$IMUz,$GYRO,$MOIRES;
 	// ---------------------------------------------------------                                                                      
 	// --------------  read sonar   -----------------------                                                                           
 	// ---------------------------------------------------------                                                                      
-        $buffer = trim(stream_get_line($sensors, 4096, "#"));                                                                     
-                                                                                                                                  
+        $buffer = trim(stream_get_line($sensors, 4096, "#"));                                                                                                                                                                                                
         if ( trim($buffer)=="" ){                                                                                                 
               return;                                                                                                           
         }                                                                                                                         
                                                                                                                                   
         $sonar_raw = substr($buffer, 1 , strlen($buffer) - 1 );   //echo $sonar_raw;                                              
-        $sonar_movement = explode('*', $buffer);             // echo $sonar_movement;                                             
+        $sonar_movement = explode('*', $buffer);             // echo $sonar_movement;   
+    // ---------------------------------------------------------                                                                      
+	// --------------  read imu   -----------------------                                                                           
+	// --------------------------------------------------------- 
+    
+
+/*    $buffer2 = trim(stream_get_line($imu, 4096, "#"));                                                                                                                                                                                                
+        if ( trim($buffer2)=="" )
+        {                                                                                                 
+              return;                                                                                                           
+        }                                                                                                                         
                                                                                                                                   
+        $imu_raw = substr($buffer2, 1 , strlen($buffer2) - 1 );   //echo $sonar_raw;                                              
+        $imu_data = explode('*', $buffer2);             // echo $sonar_movement;  
+   */                                                                                                                               
                                                                                                                                   
 	// ---------------------------------------------------------                                                                      
 	// --------------   GLOBALS sonar    -----------------------                                                                      
@@ -384,30 +138,88 @@ function refreshDIYData($sensors) {
         $DIYdistance_DOWN = trim($sonar_movement[3]);
         $DIYleftWheel = trim($sonar_movement[4]);                                                                                 
         $DIYrightWheel = trim($sonar_movement[5]);                                                                                
-        $DIYtemperature = trim($sonar_movement[6]);     
+        $DIYtemperature = trim($sonar_movement[6]);        
+        if($DIYdistance==0) 
+            $DIYdistance=99;
+        if($DIYdistance_LEFT==0) 
+            $DIYdistance_LEFT=99;
+        if($DIYdistance_RIGHT==0)
+            $DIYdistance_RIGHT=99; 
+        echo "right $DIYrightWheel left $DIYleftWheel";
+        
+        // ---------------------------------------------------------                                                                      
+	// --------------   GLOBALS imu    -----------------------                                                                      
+	// --------------------------------------------------------- 
+      //   $IMU_X = trim($imu_data[0]);                                                                             
+     //   $IMU_Y = trim($imu_data[1]);                                                                                  
+    //    $IMU_Z = trim($imu_data[2]);  
+    //  $IMU_GYRO = trim($imu_data[3]);
+     //   $IMU_MOIRES = trim($imu_data[4]);     
 }
 
-
+//Dior8wsh kinhshs gia eu8eia
+function forwardCorrection() {
+    global $curDirection,$rodal,$rodar,$$DIYleftWheel,$DIYrightWheel;
+    if($curDirection == 'w') {
+        if($DIYleftWheel == 1 && $DIYrightWheel == 0) {
+            // Left wheel at full speed
+            // Slow down the right wheel                           
+            $exec='@w'.$rodal.':'.($rodar-5).'#';
+		    $serial->deviceOpen();
+		    $serial->sendMessage($exec);
+		    $serial->deviceClose();
+        } else if($DIYleftWheel == 0 && $DIYrightWheel == 1) {
+            // Right wheel at full speed
+            // Slow down left wheel
+             $exec='@w'.($rodal-5).':'.$rodar.'#';
+		    $serial->deviceOpen();
+		    $serial->sendMessage($exec);
+		    $serial->deviceClose();
+        }
+    }
+}
 
 
 // ************************************************
 // ***************** while read data  *************
 // ************************************************
+  // forward();
+  // sleep(5);
+  // stop();
+  // die;
+  
+  function getch_nonblock($timeout) {
+    $c = array(STDIN);
+    $null = null;    // stream_select() uses references, thus variables are nec$
+    if(stream_select($c,$null,$null,floor($timeout / 1000000),$timeout % 100000$
+    return $c;
+}
+
 
 while (!feof($sensors)) {
+    $key = getch_nonblock(100);
+if(!is_null($key) && $key == 'q') 
+{
+    //stop();  
+       $exec='@q#';
+		    $serial->deviceOpen();
+		    $serial->sendMessage($exec);
+		    $serial->deviceClose();
+            break;
+    }    // Quit on F10
 	refreshDIYData($sensors);
-
-        echo "l $DIYleftWheel r $DIYrightWheel";
+   // forwardCorrection();
+  //DOwn 3 dista 12
+        echo "l $DIYleftWheel r $DIYrightWheel d $DIYdistance_DOWN dis $DIYdistance";
 	echo "\n";                                                                                                                        
 // ---------------------------------------------------------
 // --------------  car position      -----------------------
 // ---------------------------------------------------------
 		carscript();
-
 // ---------------------------------------------------------
 // --------------   write data for cloud -------------------
 // ---------------------------------------------------------
-		//writeCloud();
+		writeCloud();
 }
 
 ?>

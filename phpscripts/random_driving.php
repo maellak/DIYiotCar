@@ -68,9 +68,14 @@ function writeCloud(){
        	//DIYposx       x thessi               
        	//DIYposy       y thessi                              
        	$DIYmove = trim($GLOBALS['curMove']);         
-       	$DIYdirection = trim($GLOBALS['direction']);
-       	$DIYposx = trim($GLOBALS['posx']);
+       	$DIYdirection = trim($GLOBALS['direction']);  
+       	$DIYposx = trim($GLOBALS['posx']);  
        	$DIYposy = trim($GLOBALS['posy']);
+        $DIYgolX = trim($GLOBALS['pointX']);
+        $DIYgolY = trim($GLOBALS['pointY']);
+        if($GLOBALS['flag_first']==1)
+        {$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy*$DIYgolX*$DIYgolY#";$GLOBALS['flag_first']=0;}    
+        else
        	$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy#";
        	$DIYcloud .= "\n";    
 	$p=$GLOBALS['DIYpipecloud'];
@@ -82,18 +87,20 @@ function writeCloud(){
 // ***************** while read data  *************
 // ************************************************
 
-$GLOBALS['posx'] = 0;
-$GLOBALS['posy'] = 0;
+
+global $pointX,$pointY,$posx,$posy,$flag_first; 
+$posx=0;$posty=0;$flag_first=1;
 while (1) {
 // ---------------------------------------------------------
 // --------------   write data for cloud -------------------
 // ---------------------------------------------------------
+
 $pointX=rand(1,100);
 $pointY=rand(1,100);
 echo "Next goal [$pointX,$pointY] \n";		
 while($GLOBALS['posx']!= $pointX || $GLOBALS['posy']!=$pointY )
 {
-    if($GLOBALS['posx'] > $pointX) {
+    if($GLOBALS['posx'] > $pointX) { 
         $GLOBALS['posx']--;
     } else if($GLOBALS['posx'] < $pointX) {
           $GLOBALS['posx']++;
@@ -105,7 +112,7 @@ while($GLOBALS['posx']!= $pointX || $GLOBALS['posy']!=$pointY )
     writeCloud();
     usleep(500000);
 }
-
+$flag_first=1;
 }
 
 ?>

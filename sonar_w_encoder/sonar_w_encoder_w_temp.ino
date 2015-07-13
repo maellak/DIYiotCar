@@ -63,12 +63,12 @@ void loop(){
     //Serial.println(temperature);
   }
   
-  /////left wheeel//////////
+  /////left wheeel it's actually the right one//////////
   int valLeft = analogRead(sensorPinLeft);
-  if ( valLeft<averageDistanceLeft && prevActinaLeft>averageDistanceLeft ) 
-  {aktinaLeft=1;}
-  else
+  if ( valLeft>90 /*&& prevActinaLeft>averageDistanceLeft*/ ) 
   {aktinaLeft=0;}
+  else
+  {aktinaLeft=1;}
   /*
   {aktinaLeft++;}
   if ( aktinesLeft==aktinaLeft ) 
@@ -83,12 +83,12 @@ void loop(){
   prevActinaLeft=valLeft;
   
   
-///////////////RIGHT wheel///////////////
+///////////////RIGHT wheel (it's actually the left one)///////////////
   int valRight = analogRead(sensorPinRight);
-  if ( valRight<averageDistanceRight && prevActinaRight>averageDistanceRight )  
-  {aktinaRight=1;}
-  else
+  if ( valRight>350 /*&& prevActinaRight>averageDistanceRight*/ )  
   {aktinaRight=0;}
+  else
+  {aktinaRight=1;}
  // {aktinaRight++;}
   /*
   if ( aktinesRight==aktinaRight ) 
@@ -106,8 +106,7 @@ void loop(){
 /////////////////////////////////////////////////////////////////
   //just to slow down the output - remove if trying to catch an object passing by
   delay(delayAll); 
-  
-  
+
   ////////////////////sonar start///////////////////////
   int uS = sonar.ping();
   int uS_LEFT = sonarLeft.ping();
@@ -130,21 +129,24 @@ void loop(){
   ///////set protocol//////
   //////////@distance left*distance center*distance right*ακτινα bit left*ακτινα bit right#///////////////////////// 
   
-  Serial.print("@");
-  Serial.print(distLEFT);
-  Serial.print("*");
-  Serial.print(dist);
-  Serial.print("*");
-  Serial.print(distRIGHT);
-  Serial.print("*");
-  Serial.print(distDOWN);
-  Serial.print("*");
-  Serial.print(aktinaLeft);
-  Serial.print("*");
-  Serial.print(aktinaRight);
-  Serial.print("*");
-  Serial.print(temperature);
-  Serial.println("#");
+ Serial.print("@");
+ Serial.print(distLEFT);
+ Serial.print("*");
+ Serial.print(dist);
+ Serial.print("*");
+ Serial.print(distRIGHT);
+ Serial.print("*");
+ Serial.print(distDOWN);
+ Serial.print("*");
+ 
+ Serial.print(aktinaLeft);
+ Serial.print("*");
+ Serial.print(aktinaRight);
+ Serial.print("*");
+ Serial.println();
+ 
+ Serial.print(temperature);
+ Serial.println("#");
 
   
 /////////////////////sonar end////////////////////////

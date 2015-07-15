@@ -189,6 +189,7 @@ Serial.print("*");
                         rolloffset = 0;
                         //flag = 0;
                         break;
+                }
         }
 
         

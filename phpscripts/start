@@ -1,6 +1,2 @@
 #!/bin/sh
-rm  /tmp/lock/LCK..ttymotor
 /root/phpscripts/controller.php
-echo '@q#' > /dev/ttymotor
-PID=$!
-kill -9 $PID

@@ -73,8 +73,11 @@ function writeCloud(){
        	$DIYposy = trim($GLOBALS['posy']);
         $DIYgolX = trim($GLOBALS['pointX']);
         $DIYgolY = trim($GLOBALS['pointY']);
+        $map_name = "TestMap";
+        $map_X = 100;
+        $map_Y = 100;
         if($GLOBALS['flag_first']==1)
-        {$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy*$DIYgolX*$DIYgolY#";$GLOBALS['flag_first']=0;}    
+        {$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy*$DIYgolX*$DIYgolY*$map_name*$map_X*$map_Y#";$GLOBALS['flag_first']=0;}    
         else
        	$DIYcloud="@$DIYmove*$DIYdirection*$DIYposx*$DIYposy#";
        	$DIYcloud .= "\n";    

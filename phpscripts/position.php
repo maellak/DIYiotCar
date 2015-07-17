@@ -6,7 +6,7 @@ $posx = 0;
 $nextPosx = 0;
 $posy = 0;
 $nextPosy = 0;
-define ('DEGREES_BETWEEN_DOTS', 72);
+define ('DEGREES_BETWEEN_DOTS', 36);
 define('CAR_WHEEL_RADIUS', 3);
 define('BOUNDARY_X', 101);
 define('BOUNDARY_Y', 101);
@@ -67,20 +67,18 @@ function movementLogic() {
 				stop();
 				echo "stop\n";
 				$carIsRunning = false;
-			}  */
+			}  */ 
 			else{ 
-				forward();
-				echo "piso\n";
-        $exec='@q#';
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-        $serial->deviceClose();
-            break;
+                 stop();
+				//stop();//backward(); //prosorina
+				echo "Brhka empodio\n";
 				$carIsRunning = FALSE;
 			}
 
 			
-		}else{
+		}
+        else
+        {
 			//stop();
 			echo "Stops from position.php";
 			$carIsRunning = TRUE;
@@ -90,7 +88,7 @@ function movementLogic() {
 
 function carscript() {
 
-	global $posx, $posy, $nextPosx, $nextPosy, $DIYleftWheel, $DIYrightWheel, $prevDIYLeftWheel, $direction;
+	global $posx, $posy, $nextPosx, $nextPosy, $DIYleftWheel, $DIYrightWheel, $prevDIYLeftWheel, $direction,$curDirection;
 	// Car logic for boundaries
 	// Recalculate position
 	if($DIYleftWheel == 1 && $prevDIYLeftWheel != $DIYleftWheel) {
@@ -118,9 +116,9 @@ function carscript() {
 		$posx = $nextPosx;
 		$posy = $nextPosy;
 		movementLogic();		
-	}
-	var_dump($posx.' '.$posy.' '.$DIYleftWheel.' '.$prevDIYLeftWheel);
-
+	} 
+	//var_dump($posx.' '.$posy.' '.$DIYleftWheel.' '.$prevDIYLeftWheel);
+   echo " Dir= $curDirection ";
 	
 }
 

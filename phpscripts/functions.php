@@ -35,7 +35,6 @@ function writeCloud(){
 function forward()
 {
 	global $serial, $curDirection;
-
 	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
 	if($curDirection != 0){
 		echo "allagfhgfhgfhgfhgfhgf $curDirection ";
@@ -43,16 +42,39 @@ function forward()
 	}
 
 	if($curDirection != 'w'){ 
-		$curDirection = 'w';
-
-		$rodal = $GLOBALS['DIYrodal'];
+    echo "MPHKA FORWARD!!!!!!!!!!";
+		sleep(1);
+        $curDirection = 'w';
+        $rodal = $GLOBALS['DIYrodal'];
 		$rodar = $GLOBALS['DIYrodar'];
+        $exec='@w'.$rodal.':'.$rodar.'#';
+        /*$LR_O = $L_O-$R_O;     
+        if($LR_O>10)
+            $rodar+=1;
+        else if($LR_O<-10)
+            $rodal+=1;
 		$exec='@w'.$rodal.':'.$rodar.'#';
-        
-		$serial->deviceOpen();
+        echo "L_O = $L_O and R_O=$R_O diff = $LR_O";*/
+        $serial->deviceOpen();
 		$serial->sendMessage($exec);
 		$serial->deviceClose();
 	}
+    //else{
+        //$curDirection = 'w';
+        //$LR_O = $L_O-$R_O;     
+		//$rodal = $GLOBALS['DIYrodal'];
+		//$rodar = $GLOBALS['DIYrodar'];
+        /*if($LR_O>10)
+            $rodar+=1;
+        else if($LR_O<-10)
+            $rodal+=1;
+		$exec='@w'.$rodal.':'.$rodar.'#';
+        echo "L_O = $L_O and R_O=$R_O diff = $LR_O";
+		$serial->deviceOpen();
+		$serial->sendMessage($exec);
+		$serial->deviceClose();
+        */
+    //}
 
 }
 
@@ -151,7 +173,7 @@ function stop()
 	//chamilonoume tachitita 
 	$rodastop = $GLOBALS['DIYrodastop'];
 
-	if( $curDirection == 'w' ){
+	/*if( $curDirection == 'w' ){
 		echo "chamilono tachitita w$rodastop:$rodastop ";
 		$exec='@w'.$rodastop.':'.$rodastop.'#';
  	}elseif( $curDirection == 's'){
@@ -163,20 +185,29 @@ function stop()
 	}elseif( $curDirection == 'd'){
 		echo "chamilono tachitita d$rodastop:$rodastop ";
 		$exec="@d$rodastop:$rodastop#";
-	}
-
+	}*/
+    if($curDirection != 'q')
+    {
+        sleep(1);
+        $curDirection='q';
+        $exec = "@q#";
 		$serial->deviceOpen();
 		$serial->sendMessage($exec);
 		$serial->deviceClose();
-	
-	echo $DIYleftWheel;
-	echo " sssssssssssssssssssdsdsdfgdfghgfhgfhjfgf\n";
+	    echo "!STOP!";
+        //sleep(1);
+        //$carIsRunning = TRUE;
+        
+    }
+	//echo $DIYleftWheel;
+	//echo " sssssssssssssssssssdsdsdfgdfghgfhgfhjfgf\n";
 
-	if($curDirection != 'q' || $curDirection != '0')
+	/*if($curDirection != 'q' || $curDirection != '0')
     {
 		while($DIYleftWheel == 0)
         {
-            sleep(0.5); echo 'sleeping...'."\n"; refreshDIYData($sensors);
+            //sleep(0.5); echo 'sleeping...'."\n"; 
+            refreshDIYData($sensors);
         }
 			$curDirection = 'q';
 			echo " parking ";
@@ -185,7 +216,7 @@ function stop()
 			$serial->sendMessage($exec);
 			$serial->deviceClose();
 	}
-
+*/
 }
 
 // stamata ston palmo prin allaxis katefthinsi

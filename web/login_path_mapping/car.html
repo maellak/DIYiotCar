@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: px;
+        padding: 0px;
+        height:800px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="1340" height="800"></canvas>
+    <script>
+      window.requestAnimFrame = (function(callback) {
+        return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame ||
+        function(callback) {
+          window.setTimeout(callback, 1000 / 60);
+        };
+      })();
+
+      function drawRect(x,y, context,rotate) {
+     	 context.beginPath();
+      	context.arc(x, y, radius, 0, 2 * Math.PI, false);
+      context.fillStyle = 'green';
+      context.fill();
+      context.lineWidth = border;
+      context.strokeStyle = '#003300';
+      context.stroke();
+      context.beginPath();
+rotate=(360-rotate)+90;
+eyeDegree=30;
+radiansLeft = (rotate-eyeDegree) * (Math.PI/180);
+radiansRight = (rotate+eyeDegree) * (Math.PI/180);
+      context.arc(x +Math.sin(radiansLeft)*(radius*0.8),y + Math.cos(radiansLeft)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
+      context.fillStyle = 'red';
+      context.fill();
+      context.lineWidth = border;
+      context.strokeStyle = '#900';
+      context.stroke();
+      context.beginPath();
+      context.arc(x +Math.sin(radiansRight)*(radius*0.8),y + Math.cos(radiansRight)*(radius*0.8), radius*0.1, 0, 2 * Math.PI, false);
+      context.fillStyle = 'red';
+      context.fill();
+      context.lineWidth = border;
+      context.strokeStyle = '#900';
+      context.stroke();
+      }
+      function animate(lastTime, x,y,runAnimation, canvas, context) {
+        //if(runAnimation.value) {
+          // update
+          var time = (new Date()).getTime();
+          var timeDiff = time - lastTime;
+
+          // pixels / second
+          var linearSpeed = 100;
+          var linearDistEachFrame = linearSpeed * timeDiff / 10000;
+          currentX = x;
+          currentY = y;
+
+          if(currentX < canvas.width - radius - border) {
+            newX = currentX + linearDistEachFrame*(gotoX-currentX);
+            x = newX;
+          }
+         if(currentY < canvas.height - radius - border) {
+            newY= currentY + linearDistEachFrame*(gotoY-currentY);
+            y = newY;
+          }
+
+
+          // clear
+          context.clearRect(0, 0, canvas.width, canvas.height);
+//console.log(currentX+"x"+currentY);
+direction = Math.atan2(gotoY-currentY,  gotoX-currentX) / Math.PI * 180;
+console.log(direction);
+rotate = direction;
+          // draw
+          drawRect(currentX,currentY, context,rotate);
+
+          // request new frame
+if (Math.abs(gotoX-currentX)>2 && Math.abs(gotoY-currentY)>2)
+          requestAnimFrame(function() {
+            animate(time, x,y, runAnimation, canvas, context);
+          });
+        //}
+      }
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      var radius = 40;
+      var border = 2;
+      var centerX = radius+border;
+      var centerY = radius+border;
+      var x = centerX;
+      var y = centerY;
+      var gotoX=centerX;
+      var gotoY=centerY;
+      var currentX=centerX;
+      var currentY=centerY;
+      
+      
+      
+    
+
+      /*
+       * define the runAnimation boolean as an obect
+       * so that it can be modified by reference
+       */
+      var runAnimation = {
+        value: false
+      };
+
+
+      // add click listener to canvas
+      document.getElementById('myCanvas').addEventListener('mousedown', function(event) {
+        // flip flag
+        //runAnimation.value = !runAnimation.value;
+        //console.log(event.clientX+' x '+event.clientY);
+	//console.log("xy:"+x+" x "+y);
+	//console.log("current:"+currentX+" x "+currentY);
+        gotoX = event.clientX;
+        gotoY = event.clientY;
+if(gotoX>(canvas.width - radius - border)) gotoX=canvas.width - radius - border;
+if(gotoX<0) gotoX=radius + border;
+if(gotoY>(canvas.height - radius - border)) gotoY=canvas.height - radius - border;
+if(gotoY<0) gotoY=radius + border;
+
+        
+          var date = new Date();
+          var time = date.getTime();
+          animate(time, currentX,currentY, runAnimation, canvas, context);
+        
+      });
+      drawRect(centerX,centerY, context,0);
+
+    </script>
+  </body>
+</html>      

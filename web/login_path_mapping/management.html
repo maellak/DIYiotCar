@@ -1,0 +1,215 @@
+<html>
+<head>
+  <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- sb-admin CSS -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<script src="js/pixi.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+
+(function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;
+function f(){
+
+// ***************************************************************
+// *********************** $LAB stuff ****************************
+// ***************************************************************
+$LAB.script("js/jquery-2.1.1.js").wait()
+        .script("js/autobahn.js").wait()
+    	.script("js/diy_auto.js").wait()
+    	.script("js/plugins/jquery-ui-1.11.2.custom/jquery-ui.js").wait() 
+    	.script("js/kinetic/kinetic-v5.1.0.js").wait() 
+        .wait(function(){
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+         	AUTOBAHN_DEBUG = true;
+ 		ab.debug(true);
+ 		var diy_o =  new diy_tools();
+        	$(function(){   
+			/* 
+			 * ******************************************
+			 * get token and connect to  wss 
+			 * connect is using fro data read from device 
+			 * ******************************************
+			*/  
+                diy_o.access_token = localStorage.getItem("token");
+				var promiseDevices = diy_o.getDevices();
+                var promiseOrgs = diy_o.getorgs();
+
+                    promiseDevices.success(function (devices) {
+                        promiseOrgs.success(function (orgs){
+                        $.each(orgs.result.org, function(i, org){
+                            
+                            $('<ul id="org_'+ org.organisation +'" class="list-group" aria-label="'+ org.organisation +'"'+ org.organisation +'">'+ org.organisation +'</ul>').appendTo('#org-container');    
+                               $.each(devices.result.dev, function(i, item) {
+                                    console.log(item);
+                                    console.log(org);
+                                    if(org.organisation === item.organisation){
+                                    $('<li class="list-group-item">'+item.device+'</li>').appendTo('#org_' + item.organisation);
+                                    console.log('Devices:"' + item.device);
+                                    }
+                                });
+                        });
+                    });
+                });
+                
+
+                
+			
+            $(document).on('click', '#diy_auto', function() {
+				var id = $(this).attr('id');
+				var device= id.substr(4)
+				console.log('Devices:' + device);	
+				//.done(function (data) {
+					diy_o.device = device;
+					//diy_o.device = "kittensCategory";
+					diy_o.access_token = data.access_token;
+					diy_o.wss_connect();
+				//});
+			});
+			
+            /*
+            $(document).on('click', '.mpros', function() {
+				var id = $(this).attr('id');
+				promiseToken.done(function (data) {
+					diy_o.access_token = data.access_token;
+					diy_o.device = "auto";
+					diy_o.exec = 'startauto';
+					diy_o.diyexec();
+				});
+			});
+                        $(document).on('click', '.stop', function() {
+                                var id = $(this).attr('id');
+                                promiseToken.done(function (data) {
+                                        diy_o.access_token = data.access_token;
+                                        diy_o.device = "auto";
+                                        diy_o.exec = 'stopauto';
+                                        diy_o.diyexec();
+                                });
+                        });
+        */
+  		});
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+        });
+// ***************************************************************
+// *********************** $LAB stuff  ***************************
+// ***************************************************************
+
+}
+H(function(){if("item"in c){if(!c[0]){H(arguments.callee,25);return}c=c[0]}var a=b.createElement("script"),e=false;a.onload=a[E]=function(){if((a[D]&&a[D]!=="complete"&&a[D]!=="loaded")||e){return false}a.onload=a[E]=null;e=true;f()};
+a.src="js/LAB.js";
+c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=function(){b.removeEventListener(F,d,false);b[D]="complete"},false)}})(this,document);
+
+
+</script>
+
+</head>
+<body>
+<div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="home.html">DIYiot Project</a>
+            </div>
+            
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li>
+                        <a href="home.html">Home</a>
+                    </li>
+                    <li>
+                        <a href="auto.html">DIYiot Car Control Panel</a>
+                    </li>
+                    <li>
+                        <a href="management.html">Manage devices</a>
+                    </li>
+                    <li>
+                        <div id="logout">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+<div id="page-wrapper">
+
+	<div class="container-fluid">
+
+	<!-- Page Heading -->
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">
+				Manage users and devices.
+			</h1>
+	  </div>
+	</div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="org-container" class="nav nav-tabs">
+            </div>
+        </div>
+    </div>
+	<br />
+	
+    <div id="commands" class="commands">
+       <div id="commands-group" class="btn-group" role="group">
+       </div>
+    </div>
+	
+
+    <div id="canvas"></div>
+
+	<div id="dataDev" class="dataDev table-responsive" style="display: none;">
+		<table class="table table-hover">
+			<thead id="listheaders" style="font-weight: bold;">
+			</thead>
+			<tbody id="listtable">
+			</tbody>
+		</table>
+	</div>
+	<div id="dataDev1" class="dataDev1 table-responsive" style="display: none;">
+    </div>
+	
+	
+	</div>
+			  
+			  
+</div>
+</div>
+<script>
+
+    if(localStorage.getItem("token") === null)
+        window.location = "index.html";
+    else
+        document.getElementById('logout').innerHTML = '<button type="button" class="btn btn-default" onclick="logout()">Logout</button>';
+
+    function logout(){
+        localStorage.removeItem("token");
+        window.location = "index.html";
+    }
+
+</script>
+</body>
+</html>

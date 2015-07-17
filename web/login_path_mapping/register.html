@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Arduino@net</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- sb-admin CSS -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<script type="text/javascript">
+ function validatePass()
+{
+    var client_secret = document.getElementById('client_secret');
+    var pass_conf = document.getElementById('pass_conf');
+    var res = document.getElementById('validationRes');
+    if(client_secret.value == pass_conf.value){
+        client_secret.style.backgroundColor = "#f3f8ed";
+		pass_conf.style.backgroundColor = "#f3f8ed";
+        res.style.color = "#00000";
+        res.innerHTML = " "
+    }else{
+        client_secret.style.backgroundColor = "#efdee0";
+		pass_conf.style.backgroundColor = "#efdee0";
+        res.style.color = "#00000";
+        res.innerHTML = "Passwords do not match!"
+    }
+}  
+</script>
+</head>
+
+<body>
+
+<script>
+
+(function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;
+function f(){
+
+// ***************************************************************
+// *********************** $LAB stuff ****************************
+// ***************************************************************
+$LAB.script("js/jquery-2.1.1.js").wait()
+        .script("js/autobahn.js").wait()
+        .script("js/diy_auto.js").wait()
+        .script("js/plugins/jquery-ui-1.11.2.custom/jquery-ui.js").wait() 
+        .script("js/kinetic/kinetic-v5.1.0.js").wait() 
+        .wait(function(){
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+            AUTOBAHN_DEBUG = true;
+        ab.debug(true);
+        var diy_o =  new diy_tools();
+            $(function(){   
+            /* 
+             * ******************************************
+             * get token and connect to  wss 
+             * connect is using fro data read from device 
+             * ******************************************
+            */ 
+            diy_o.access_token = localStorage.getItem("token");
+            $(document).on('click', '#register', function() {
+                var first_name = $("#first_name").val();
+                var last_name = $("#last_name").val();
+                var email = $("#email").val();
+                var client_id = $("#client_id").val();
+                var client_secret = $("#client_secret").val();
+                var Register = diy_o.register(client_id,client_secret,first_name,last_name,email);
+                Register.success(function(){
+                    console.log("Registered successfully");
+                });
+
+                });
+            });
+
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+        });
+// ***************************************************************
+// *********************** $LAB stuff  ***************************
+// ***************************************************************
+
+}
+H(function(){if("item"in c){if(!c[0]){H(arguments.callee,25);return}c=c[0]}var a=b.createElement("script"),e=false;a.onload=a[E]=function(){if((a[D]&&a[D]!=="complete"&&a[D]!=="loaded")||e){return false}a.onload=a[E]=null;e=true;f()};
+a.src="js/LAB.js";
+c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=function(){b.removeEventListener(F,d,false);b[D]="complete"},false)}})(this,document);
+
+</script>
+      <div id="wrapper">  
+      <!-- Navigation -->
+     	   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        		    <!-- Brand and toggle get grouped for better mobile display -->
+          		    <div class="navbar-header">
+                		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    			<span class="sr-only">Toggle navigation</span>
+                  		        <span class="icon-bar"></span>
+                    			<span class="icon-bar"></span>
+                    			<span class="icon-bar"></span>
+                		</button>
+               			 <a class="navbar-brand" href="home.html">DIYiot Project</a>
+            		    </div>
+
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li>
+                        <a href="home.html">Home</a>
+                    </li>
+                    <li>
+                        <a href="auto.html">DIYiot Car Control Panel</a>
+                    </li>
+                    <li>
+                        <a href="adddev.html">Add device</a>
+                    </li>
+                    <li>
+                        <div id="logout">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+    <div id="page-wrapper">
+
+            <div class="container-fluid">
+			 <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Register
+
+                        </h1>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+            </div>
+            <!-- /.container-fluid -->
+
+ 
+<div class="formWrapper">
+    <form class="form-horizontal" role="form" action="https://arduino.os.cs.teiath.gr/api/register" method="POST">
+     <div class="form-group">
+        <label for="first_name" class="col-sm-2 control-label">Name</label>
+		<div class="col-sm-10">
+		  <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Name" required>
+        </div>
+     </div>
+	 <div class="form-group">
+        <label for="last_name" class="col-sm-2 control-label">Surname</label>
+		<div class="col-sm-10">
+		  <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Surname" required>
+        </div>
+     </div>
+	 <div class="form-group">
+        <label for="email" class="col-sm-2 control-label">Email address</label>
+		<div class="col-sm-10">
+		  <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+        </div>
+     </div>
+	 <div class="form-group">
+        <label for="client_id" class="col-sm-2 control-label">Username</label>
+		<div class="col-sm-10">
+		  <input type="text" class="form-control" name="client_id" id="client_id" placeholder="Username" required>
+        </div>
+     </div>
+	 <div class="form-group">
+        <label for="client_secret" class="col-sm-2 control-label">Password</label>
+		<div class="col-sm-10">
+          <input type="password" class="form-control" name="client_secret" id="client_secret" placeholder="Password" required onkeyup="validatePass(); return false;">
+        </div>
+     </div>
+	 <div class="form-group">
+        <label for="pass_conf" class="col-sm-2 control-label">Confirm Password</label>
+		<div class="col-sm-10">
+          <input type="password" class="form-control" name="pass_conf" id="pass_conf" placeholder="Re-enter your Password" required onkeyup="validatePass(); return false;">
+          
+        </div>
+		<div class="col-sm-10">
+		  <span id="validationRes" class="validationRes"></span>
+		</div>
+	</div>
+
+	  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" class="btn btn-primary" id="register"> Register</button>
+    </div>
+  </div>
+
+    </form>
+</div>
+   </div>
+ </body>
+</html>

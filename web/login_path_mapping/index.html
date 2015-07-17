@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Arduino@net</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- sb-admin CSS -->
+
+    <!-- Custom CSS -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+<script src="js/diy_js.js"></script>
+
+
+<script>
+
+(function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;
+function f(){
+
+// ***************************************************************
+// *********************** $LAB stuff ****************************
+// ***************************************************************
+$LAB.script("js/jquery-2.1.1.js").wait()
+        .script("js/autobahn.js").wait()
+        .script("js/diy_auto.js").wait()
+        .script("js/plugins/jquery-ui-1.11.2.custom/jquery-ui.js").wait() 
+        .script("js/kinetic/kinetic-v5.1.0.js").wait() 
+        .wait(function(){
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+            AUTOBAHN_DEBUG = true;
+        ab.debug(true);
+        var diy_o =  new diy_tools();
+            $(function(){   
+            /* 
+             * ******************************************
+             * get token and connect to  wss 
+             * connect is using fro data read from device 
+             * ******************************************
+            */ 
+            $(document).on('click', '#login', function(){
+                var user = $("#username").val();
+                var pass = $("#password").val();
+                var promiseToken = diy_o.getToken(user, pass);
+                
+                promiseToken.done(function (data) {
+                diy_o.access_token = data.access_token;
+                
+                localStorage.setItem("token", data.access_token);
+                    if(localStorage.getItem("token") !== null)    
+                        window.location = "home.html";
+                })        
+            });
+            
+
+        });
+        });
+// ***************************************************************
+// *********************** $LAB stuff  ***************************
+// ***************************************************************
+
+}
+H(function(){if("item"in c){if(!c[0]){H(arguments.callee,25);return}c=c[0]}var a=b.createElement("script"),e=false;a.onload=a[E]=function(){if((a[D]&&a[D]!=="complete"&&a[D]!=="loaded")||e){return false}a.onload=a[E]=null;e=true;f()};
+a.src="js/LAB.js";
+c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=function(){b.removeEventListener(F,d,false);b[D]="complete"},false)}})(this,document);
+
+
+</script>
+
+</head>
+<body>
+
+    <div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-4">
+            <h1 class="text-center login-title">Sign in to continue to DIYiot Project.</h1>
+            <div class="account-wall">
+                
+                <input type="text" class="form-control" placeholder="Username" id="username"required autofocus>
+                <input type="password" class="form-control" placeholder="Password" id="password" required>
+                <button class="btn btn-lg btn-primary btn-block" type="button" id="login">
+                    Sign in</button>
+            </div>
+            <a href="register.html" class="text-center new-account">Register</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

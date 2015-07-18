@@ -4,7 +4,7 @@
 define ('DEGREES_BETWEEN_DOTS', 72);
 define('CAR_WHEEL_RADIUS', 3);
 //define('BOUNDARY_X', 101); 
-//define('BOUNDARY_Y', 101);
+//define('BOUNDARY_Y', 101); 
 define('OBSTACLE', 10);
 
 //include "/root/phpscripts/PHP-Serial/src/PhpSerial.php";

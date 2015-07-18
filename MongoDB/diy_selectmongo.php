@@ -93,23 +93,29 @@ function diy_select($payload,$storage){
     $client_id=$up->client_id;
 
     try {
-    	$mongoResult = "";
-    	$m = new MongoClient("mongodb://localhost:9999");
-		$db = $m->selectDB("diyiot_sensorsData");
-		$collection = $db->mycol;
-		switch (n) {
-    		case 1:$mongoResult = iterator_to_array($collection->find(array("Map.map_Name" => $map)));
-    		case 3:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day));
-    		case 4:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day ,"Map.map_Name" => $map));
-    	default:
-        	
-		}
-    	$result["response"] = 
+        $mongoResult = "";
+        //$m = new MongoClient("mongodb://localhost:9999");
+        $m = new MongoClient("mongodb://localhost:27017");
+        $db = $m->selectDB("diyiot_sensorsData");
+        $collection = $db->mycol;
+        switch (n) {
+            case 1:$mongoResult = iterator_to_array($collection->find(array("Map.map_Name" => $map)));
+            case 3:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day)));
+            case 4:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day ,"Map.map_Name" => 
+$map)));
+        default:
+            
+        }
+        //$result["response"] = 
+                $result["message"] = "[".$result["method"]."][".$result["function"]."]: NoErrors";
+                $result["status"] = "200";
+                $result["result"]=  $devices;
+
 
     } catch (Exception $e) {
-	$diy_error["db"] = $e->getCode();
-	$result["status"] = $e->getCode();
-	$result["message"] = "[".$result["method"]."][".$result["function"]."]:".$e->getMessage();
+    $diy_error["db"] = $e->getCode();
+    $result["status"] = $e->getCode();
+    $result["message"] = "[".$result["method"]."][".$result["function"]."]:".$e->getMessage();
     }
 
         if(diyConfig::read('debug') == 1){

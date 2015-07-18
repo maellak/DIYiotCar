@@ -3,30 +3,27 @@
 // ***************** function cloud *********
 // ************************************************
 
-//function for write data cloud
+//function for write data cloud 
+$time = time();
+/*
 function writeCloud(){
-       	//DIYmove       w,s,a,r                               
-       	//DIYdirection  moires                                           
+    global $time,$DIYdistance_LEFT,$DIYdistance,$DIYdistance_RIGHT,$DIYdistance_DOWN,$DIYleftWheel,$DIYrightWheel,$DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
+       	//DIYdirection       w,s,a,r                                                                        
        	//DIYposx       x thessi               
        	//DIYposy       y thessi                               
        	$DIYdirection = trim($GLOBALS['curDirection']);
        	$DIYposx = trim($GLOBALS['posx']);
-       	$DIYposy = trim($GLOBALS['posy']);
-        /*
-        $DIYdistance_LEFT = trim($sonar_movement[0]);                                                                             
-        $DIYdistance = trim($sonar_movement[1]);                                                                                  
-        $DIYdistance_RIGHT = trim($sonar_movement[2]);  
-        $DIYdistance_DOWN = trim($sonar_movement[3]);
-        $DIYleftWheel = trim($sonar_movement[4]);                                                                                 
-        $DIYrightWheel = trim($sonar_movement[5]);                                                                                
-        $DIYtemperature = trim($sonar_movement[6]); 
-        */ //x y ari mpo dejia therm imu
-       	$DIYcloud="@$DIYdirection*0*$DIYposx*$DIYposy*#";
-       	$DIYcloud .= "\n";    
+       	$DIYposy = trim($GLOBALS['posy']);     
+       	$DIYcloud = "@$time*$DIYdirection*$DIYposx*$DIYposy";//$time 4
+        $DIYcloud .= "*$DIYdistance_LEFT*$DIYdistance*$DIYdistance_RIGHT*$DIYdistance_DOWN*$DIYleftWheel*$DIYrightWheel*$DIYtemperature"; //7
+        $DIYcloud .= "*$ac_X*$ac_Y*$ac_Z*$g_X*$g_Y*$g_Z*$head*$pitch*$roll";//9
+        $DIYcloud .= "*Map_Name1*100*100#" ;//3
+        $DIYcloud .= "\n";     
+        //echo "CLOUD --  $DIYcloud\n"; 
 	$p=$GLOBALS['DIYpipecloud'];
-	fwrite($p, $DIYcloud."\n");
+	fwrite($p, $DIYcloud."\n");  
 }
-
+*/
 // ************************************************
 // ***************** function motion move *********
 // ************************************************
@@ -43,7 +40,7 @@ function forward()
 
 	if($curDirection != 'w'){ 
     echo "MPHKA FORWARD!!!!!!!!!!";
-		sleep(1);
+		sleep(0.01);
         $curDirection = 'w';
         $rodal = $GLOBALS['DIYrodal'];
 		$rodar = $GLOBALS['DIYrodar'];
@@ -188,7 +185,7 @@ function stop()
 	}*/
     if($curDirection != 'q')
     {
-        sleep(1);
+        sleep(0.01);
         $curDirection='q';
         $exec = "@q#";
 		$serial->deviceOpen();

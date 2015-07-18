@@ -6,7 +6,7 @@ $posx = 0;
 $nextPosx = 0;
 $posy = 0;
 $nextPosy = 0;
-define ('DEGREES_BETWEEN_DOTS', 36);
+define ('DEGREES_BETWEEN_DOTS', 36); 
 define('CAR_WHEEL_RADIUS', 3);
 define('BOUNDARY_X', 101);
 define('BOUNDARY_Y', 101);
@@ -38,13 +38,14 @@ function movementLogic() {
 
 	global $posx, $posy,$serial,
  $curMove, $direction, $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $carIsRunning;
-	echo "logic";
-	echo $carIsRunning;
-		if ( $carIsRunning ) {
-			echo " forward ";
-			if (  ( $DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE && $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
-                forward();
-				echo "empros\n";
+	//echo "logic";
+	//echo $carIsRunning;
+    echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" ;
+		if ( $carIsRunning ) { 
+			//echo " forward ";
+			if (  (  $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
+                forward();//$DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE &&
+				//echo "empros\n";
 				$carIsRunning = TRUE;
 			}  
 /*            
@@ -68,16 +69,16 @@ function movementLogic() {
 				echo "stop\n";
 				$carIsRunning = false;
 			}  */ 
-			else{ 
+			else{  
                  stop();
 				//stop();//backward(); //prosorina
-				echo "Brhka empodio\n";
+				//echo "Brhka empodio\n";
 				$carIsRunning = FALSE;
 			}
 
 			
 		}
-        else
+        else 
         {
 			//stop();
 			echo "Stops from position.php";

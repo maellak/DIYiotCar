@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>tracking.js - face with camera</title>
+  <link rel="stylesheet" href="assets/demo.css">
+
+  <script src="../build/tracking.js"></script>
+  <script src="../build/data/face-min.js"></script>
+  <script src="https://raw.githubusercontent.com/dataarts/dat.gui/master/build/dat.gui.min.js"></script>
+  <script src="assets/stats.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+  <style>
+  img, canvas {
+    margin-left: 230px;
+    margin-top: 120px;
+    position: absolute;
+  }
+  </style>
+</head>
+<body>
+  <div class="demo-title">
+    <p><a href="http://trackingjs.com" target="_parent">tracking.js</a> － get user's webcam and detect faces</p>
+  </div>
+
+  <div class="demo-frame">
+    <div class="demo-container">
+      <img src="https://arduino.os.cs.teiath.gr/mjpg_stream_proxy.php" id="img" width="320" height="240" alt="FAIL" crossorigin="anonymous">
+      <canvas id="canvas" width="320" height="240"></canvas>
+    </div>
+  </div>
+
+  <script>
+  //http://pngimg.com/upload/face_PNG5660.png				OBAMA
+  //crossorigin="anonymous"
+  //home/ellak/Desktop/New/tracking.js-master/examples/face.jpg
+  //http://192.128.0.220:8080/?action=stream
+  ///home/ellak/Desktop/New/tracking.js-master/examples/obama.png
+  //http://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m%2801-32%29_gr.jpg
+    $(document).ready(function() {
+  
+    
+    
+      var img = document.getElementById('img'); 
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+     
+     for (i=1; i<1;i++) {
+
+      var tracker = new tracking.ObjectTracker('face');
+      tracker.setInitialScale(4);
+      tracker.setStepSize(2);
+      tracker.setEdgesDensity(0.1);
+
+		
+      tracking.track('#img', tracker);
+      
+      //tracking.Canvas.loadimage('#canvas',http://www.uni-regensburg.de/Fakultaeten/phil_Fak_II/Psychologie/Psy_II/beautycheck/english/durchschnittsgesichter/m(01-32)_gr.jpg)
+
+      tracker.on('track', function(event) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        event.data.forEach(function(rect) {
+          context.strokeStyle = '#a64ceb';
+          context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+          context.font = '11px Helvetica';
+          context.fillStyle = "#fff";
+          context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+          context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+        });
+      });
+      }
+
+      var gui = new dat.GUI();
+      gui.add(tracker, 'edgesDensity', 0.1, 0.5).step(0.01);
+      gui.add(tracker, 'initialScale', 1.0, 10.0).step(0.1);
+      gui.add(tracker, 'stepSize', 1, 5).step(0.1);
+     });
+    </script>
+
+</body>
+</html>

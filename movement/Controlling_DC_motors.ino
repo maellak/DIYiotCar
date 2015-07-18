@@ -25,12 +25,14 @@ void setup() {
   myMotor2->run(FORWARD);
   // turn on motor
   myMotor2->run(RELEASE);
+  
+  Serial.setTimeout(5);  // degrees timeout because it had to wait 2 minutes for every movement
 }
 
 
    String command;
    int commandIndex;
-   QueueArray  <String> stack;
+   QueueArray <String> stack;
 void loop() {
   String *allcomands;
   if(Serial.available() > 0){

@@ -14,14 +14,7 @@
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- sb-admin CSS -->
-    <link href="css/sb-admin.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="css/custom.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+ 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -86,11 +79,48 @@ $LAB.script("js/jquery-2.1.1.js").wait()
                 var email = $("#email").val();
                 var client_id = $("#client_id").val();
                 var client_secret = $("#client_secret").val();
-                var Register = diy_o.register(client_id,client_secret,first_name,last_name,email);
-                Register.success(function(){
-                    console.log("Registered successfully");
-                });
+		var isReady=false;
+		if(first_name!=""&last_name!=""&email!=""&client_id!=""&client_secret!=""){
+                	var Register = diy_o.register(client_id,client_secret,first_name,last_name,email);
+              	        Register.success(function(){
+                   	 console.log("Registered successfully");
+               	        });
+                        isReady=true;
+		}else{
+			if(first_name==""){
+				document.getElementById("errorFN").innerHTML="*Please type first name";
+		        }else{
+			       document.getElementById("errorFN").innerHTML=" ";
+                        }
 
+                        if(last_name==""){
+                                document.getElementById("errorLN").innerHTML="*Please type last name";
+			}else{
+                               document.getElementById("errorLN").innerHTML=" ";
+                        }
+
+		        if(email==""){
+                                document.getElementById("errorE").innerHTML="*Please type email";
+			}else{
+                               document.getElementById("errorE").innerHTML=" ";
+                        }
+                 	if(client_id==""){
+                                document.getElementById("errorCI").innerHTML="*Please type username";
+			}else{
+                               document.getElementById("errorCI").innerHTML=" ";
+                        }
+
+                        if(client_secret==""){
+                                document.getElementById("errorCS").innerHTML="*Please type password";
+			}else{
+                               document.getElementById("errorCS").innerHTML=" ";
+                        }
+
+		}
+		if(isReady)
+			window.location = "index.html";
+		if(email.search("@")==-1)
+                         document.getElementById("errorE").innerHTML="*Please type a valid email address";
                 });
             });
 
@@ -126,17 +156,7 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li>
-                        <a href="home.html">Home</a>
-                    </li>
-                    <li>
-                        <a href="auto.html">DIYiot Car Control Panel</a>
-                    </li>
-                    <li>
-                        <a href="adddev.html">Add device</a>
-                    </li>
-                    <li>
-                        <div id="logout">
-                        </div>
+                        <a href="index.html">Login</a>
                     </li>
                 </ul>
             </div>
@@ -167,47 +187,57 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
         <label for="first_name" class="col-sm-2 control-label">Name</label>
 		<div class="col-sm-10">
 		  <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Name" required>
-        </div>
+                 <p id="errorFN"></p> 
+       </div>
      </div>
 	 <div class="form-group">
         <label for="last_name" class="col-sm-2 control-label">Surname</label>
 		<div class="col-sm-10">
 		  <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Surname" required>
+                  <p id="errorLN"></p>
         </div>
      </div>
 	 <div class="form-group">
         <label for="email" class="col-sm-2 control-label">Email address</label>
 		<div class="col-sm-10">
 		  <input type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+		  <p id="errorE"></p>
         </div>
      </div>
 	 <div class="form-group">
         <label for="client_id" class="col-sm-2 control-label">Username</label>
 		<div class="col-sm-10">
 		  <input type="text" class="form-control" name="client_id" id="client_id" placeholder="Username" required>
+		  <p id="errorCI"><p>
         </div>
      </div>
 	 <div class="form-group">
         <label for="client_secret" class="col-sm-2 control-label">Password</label>
 		<div class="col-sm-10">
           <input type="password" class="form-control" name="client_secret" id="client_secret" placeholder="Password" required onkeyup="validatePass(); return false;">
-        </div>
+	<p id="errorCS"></p>   
+     </div>
      </div>
 	 <div class="form-group">
         <label for="pass_conf" class="col-sm-2 control-label">Confirm Password</label>
 		<div class="col-sm-10">
           <input type="password" class="form-control" name="pass_conf" id="pass_conf" placeholder="Re-enter your Password" required onkeyup="validatePass(); return false;">
-          
+		 <div class="col-sm-10">
+                  <span id="validationRes" class="validationRes"></span>
+                </div>
+         
         </div>
-		<div class="col-sm-10">
-		  <span id="validationRes" class="validationRes"></span>
-		</div>
+
+
+
 	</div>
 
 	  <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button type="button" class="btn btn-primary" id="register"> Register</button>
-    </div>
+
+
+ </div>
   </div>
 
     </form>

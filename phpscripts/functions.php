@@ -5,10 +5,10 @@
 
 //function for write data cloud 
 $time = time();
-/*
+
 function writeCloud(){
     global $time,$DIYdistance_LEFT,$DIYdistance,$DIYdistance_RIGHT,$DIYdistance_DOWN,$DIYleftWheel,$DIYrightWheel,$DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
-       	//DIYdirection       w,s,a,r                                                                        
+       	//DIYdirection       w,s,a,d                                                                        
        	//DIYposx       x thessi               
        	//DIYposy       y thessi                               
        	$DIYdirection = trim($GLOBALS['curDirection']);
@@ -23,7 +23,7 @@ function writeCloud(){
 	$p=$GLOBALS['DIYpipecloud'];
 	fwrite($p, $DIYcloud."\n");  
 }
-*/
+
 // ************************************************
 // ***************** function motion move *********
 // ************************************************
@@ -33,10 +33,10 @@ function forward()
 {
 	global $serial, $curDirection;
 	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
-	if($curDirection != 0){
-		echo "allagfhgfhgfhgfhgfhgf $curDirection ";
-		stopBeforeCD('w', $curDirection);
-	}
+	//if($curDirection != 0){
+	//	echo "allagfhgfhgfhgfhgfhgf $curDirection ";
+	//	stopBeforeCD('w', $curDirection);
+	//}
 
 	if($curDirection != 'w'){ 
     echo "MPHKA FORWARD!!!!!!!!!!";
@@ -79,9 +79,10 @@ function forward()
 function backward()
 {
 	global $serial, $curDirection;
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
-	stopBeforeCD('s', $curDirection);
+	//// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
+	//stopBeforeCD('s', $curDirection);
 
+    /*
 	if($curDirection != 's'){
 		echo "backkkkkkkkkkkkk";
 		$curDirection = 's';
@@ -94,71 +95,58 @@ function backward()
 		$serial->sendMessage($exec);
 		$serial->deviceClose();
 	}
+    */
+        if($curDirection != 's')
+    {
+        $curDirection = 's' ;
+        sleep(0.01);
+        $rodal = $GLOBALS['DIYrodal'];
+		$rodar = $GLOBALS['DIYrodar'];
+        $exec = "@s".$rodal.":".$rodar."#";
+		$serial->deviceOpen(); 
+		$serial->sendMessage($exec);
+		$serial->deviceClose();
+	    echo "!BACK!";
+        //sleep(1);
+        //$carIsRunning = TRUE;       
+    }
+    
+    
 }
 
 //function for rotation                                
-function rotateLeft($m){                    
-        global $serial, $DIYleftWheel, $sensors, $curDirection;      
-        $palmos = 32;                       
-                                       
-        // stop prin tin allagi katefthinsis to theloume gia na echoume ton palmo                                          
-        if( $curDirection != 'a' ){                                                   
-                stopBeforeCD('a',$curDirection);                                          
-        }                                                                        
-                                                                                 
-        $curDirection = 'a';                                                       
-                                                                                 
-        $rodarotation = $GLOBALS['DIYrodarotation'];                             
-        $exec="@a$rodarotation:$rodarotation#";     
-                                                    
-        $serial->deviceOpen();                      
-        $serial->sendMessage($exec);                
-        $serial->deviceClose();                     
-                                                    
-        $curM = 0;                                  
-        $prevLeftWheel = 0;                         
-        while($curM < $m) {
-//var_dump($curM.' '.$DIYleftWheel.' '.$DIYleftWheel);
-                if($prevLeftWheel != $DIYleftWheel && $DIYleftWheel == 1) {
-                        $curM = $curM + $palmos;                           
-                }                                                          
-                $prevLeftWheel = $DIYleftWheel;                           
-		refreshDIYData($sensors); 
-        }                                                                  
-                                                                           
-        // Send stop                                                       
-        stop();                                                            
-}   
 
-function rotateRight($m){                                                        
-        global $serial, $DIYleftWheel, $sensors, $curDirection;                                           
-        $palmos = 32;                                                            
-                                                                                                                          
-        if( $curDirection != 'd' ){                                                   
-                stopBeforeCD('d',$curDirection);                                          
-        }                                                                        
-                                                                                 
-        $curDirection = 'd';                                                       
-                                                                                 
-        $rodarotation = $GLOBALS['DIYrodarotation'];                             
-        $exec="@d$rodarotation:$rodarotation#";                                  
-                                                                                 
-        $serial->deviceOpen();                                                   
-        $serial->sendMessage($exec);                                             
-        $serial->deviceClose();                                                  
-                                                                                 
-        $curM = 0;                                                               
-        $prevLeftWheel = 0;                                                     
-        while($curM < $m) {                                                      
-                if($prevLeftWheel != $DIYleftWheel && $DIYleftWheel == 1) {      
-                        $curM = $curM + $palmos;                                 
-                }                                                                
-                $prevLeftWheel = $DIYleftWheel;                                  
-		refreshDIYData($sensors);
-        }                                                                        
-                                                                                 
-        // Send stop                                                             
-        stop();                                                                  
+function rotate($m,$d){                    
+        global $serial, $DIYleftWheel, $sensors,$imu,$curDirection,$head;
+ 
+        if($curDirection!='a' || $curDirection!='d')
+        {
+            echo "Rotate\n";
+            stop();
+            sleep(0.01);
+            if($curDirection=='a')
+              $wantedMoires = $head-$m;  
+            else 
+             $wantedMoires = $head+$m; 
+         
+            $curDirection = $d;           
+            if($wantedMoires <0)
+            $wantedMoires = 360 + $wantedMoires;
+            sleep(0.01);
+            $exec = "@a060:063#";
+            $serial->deviceOpen();                      
+            $serial->sendMessage($exec);                
+            $serial->deviceClose();  
+            while(!($wantedMoires-2<= $head && $head <=$wantedMoires+2))
+            {
+                refreshDIYData($sensors,$imu);
+                echo " wanted moires $wantedMoires  head $head  \n" ;               
+            } 
+            stop();
+            sleep(0.01);            
+        }
+      
+       
 }  
 
 
@@ -168,7 +156,7 @@ function stop()
 	global $serial, $DIYleftWheel, $sensors, $curDirection;
 
 	//chamilonoume tachitita 
-	$rodastop = $GLOBALS['DIYrodastop'];
+	//$rodastop = $GLOBALS['DIYrodastop'];
 
 	/*if( $curDirection == 'w' ){
 		echo "chamilono tachitita w$rodastop:$rodastop ";

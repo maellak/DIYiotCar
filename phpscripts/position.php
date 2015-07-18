@@ -40,50 +40,53 @@ function movementLogic() {
  $curMove, $direction, $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $carIsRunning;
 	//echo "logic";
 	//echo $carIsRunning;
-    echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" ;
+   // echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" ;
 		if ( $carIsRunning ) { 
 			//echo " forward ";
-			if (  (  $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
-                forward();//$DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE &&
-				//echo "empros\n";
+			if (  (  $DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE && $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
+                forward();//
 				$carIsRunning = TRUE;
-			}  
-/*            
-            elseif (($curMove != 'a') && ($DIYdistance_LEFT > $DIYdistance_RIGHT) && ($DIYdistance_LEFT > OBSTACLE)){ 
-				rotateLeft(64);//left(); 
+			} 
+            else if(  $DIYdistance_RIGHT < OBSTACLE && $DIYdistance_LEFT < OBSTACLE && $DIYdistance < OBSTACLE )
+            {
+                backward();
+                $carIsRunning = TRUE;
+            }          
+           elseif (($curMove != 'a' && $curMove != 'd') && ($DIYdistance_LEFT > $DIYdistance_RIGHT) && ($DIYdistance_LEFT > OBSTACLE)){ 
+				rotate(64,'a');//left(); 
                 //stop();
-				echo "aristera\n";
 				$carIsRunning = TRUE;
 
-			}
-            elseif (($curMove != 'd') && ($DIYdistance_LEFT < $DIYdistance_RIGHT) && ($DIYdistance_RIGHT > OBSTACLE)){ 
-				rotateRight(64);//right();
+			}                       
+            elseif (($curMove != 'd' && $curMove != 'a') && ($DIYdistance_LEFT < $DIYdistance_RIGHT) && ($DIYdistance_RIGHT > OBSTACLE))
+            { 
+				rotate(64,'d');//right();
                 //stop();
-				echo "dexia\n";
 				$carIsRunning = TRUE;
-
 			}
-           
+        /*   
         elseif ( ($DIYdistance_RIGHT <= OBSTACLE) && ($DIYdistance_LEFT <= OBSTACLE) && ($DIYdistance <= OBSTACLE) ) {				
 				stop();
 				echo "stop\n";
 				$carIsRunning = false;
-			}  */ 
+			}  
+            */ 
 			else{  
                  stop();
 				//stop();//backward(); //prosorina
 				//echo "Brhka empodio\n";
-				$carIsRunning = FALSE;
+				$carIsRunning = TRUE;//FALSE;
 			}
 
 			
-		}
-        else 
+		}       
+        /*else 
         {
 			//stop();
-			echo "Stops from position.php";
+			//echo "Stops from position.php";
 			$carIsRunning = TRUE;
-		}
+		}*/
+        
 	
 }
 
@@ -119,7 +122,7 @@ function carscript() {
 		movementLogic();		
 	} 
 	//var_dump($posx.' '.$posy.' '.$DIYleftWheel.' '.$prevDIYLeftWheel);
-   echo " Dir= $curDirection ";
+   //echo " Dir= $curDirection ";
 	
 }
 

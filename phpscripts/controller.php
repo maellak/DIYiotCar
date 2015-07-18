@@ -112,13 +112,12 @@ if (!$sensors = fopen("/dev/ttysonar", "r")){
 	exit;                                                                   
 }        
 
-/*
-// fopen for read imu data
+
+// fopen for read imu data 
 if (!$imu = fopen("/dev/ttyimu", "r")){            
 	echo "Cannot link with imu, wrong usb connected";                    
 	exit;                                                                   
 }  
-*/
 
 // ************************************************
 // ***************** function shutown  *************
@@ -133,30 +132,29 @@ function shutdown()
 
 
 function refreshDIYData($sensors,$imu) {
-	global $DIYdistance_LEFT, $DIYdistance,$DIYdistance_DOWN, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature;
+	global $DIYdistance_LEFT, $DIYdistance,$DIYdistance_DOWN, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
+    do {
     //IMU:ac_ GIa accelerometer,g_ Gia gyroscope 
     //global $ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
 	// ---------------------------------------------------------                                                                      
 	// --------------  read sonar   -----------------------                                                                           
 	// ---------------------------------------------------------                                                                      
-     //sleep(0.01);
       
     $buffer = trim(fgets($sensors, 4096)); 
-    echo $buffer;
+    //echo $buffer;
        if ( trim($buffer)=="" ){                                                                                                 
-              return;                                                                                                           
+              continue;                                                                                                           
         }                                                                                                                         
                                                                                                                                   
         $sonar_raw = substr($buffer, 1 , strlen($buffer) - 1 );   //echo $sonar_raw;                                              
         $sonar_movement = explode('*', $buffer);             // echo $sonar_movement;  
-    /*     $buffer = trim(fgets($imu, 4096));             
+         $buffer = trim(fgets($imu, 4096));             
         if ( trim($buffer)=="" ){                                                                                                 
-              return;                                                                                                           
+              continue;                                                                                                            
         }                                                                                                                         
           //imu                                                                                                                        
         $imu_raw = substr($buffer, 1 , strlen($buffer) - 1 );   //echo $sonar_raw;                                              
-        $imu_data = explode('*', $buffer);             // echo $sonar_movement;    
-*/        
+        $imu_data = explode('*', $buffer);             // echo $sonar_movement;            
 	// ---------------------------------------------------------                                                                      
 	// --------------   GLOBALS sonar    -----------------------                                                                      
 	// ---------------------------------------------------------                                                                      
@@ -179,21 +177,20 @@ function refreshDIYData($sensors,$imu) {
 
         	// ---------------------------------------------------------                                                                      
 	// --------------   GLOBALS imu    -----------------------                                                                      
-	// ---------------------------------------------------------                                                                      
-/*       
+	// ---------------------------------------------------------                                                                            
        $ac_X = substr(trim($imu_data[0]),1);                                                                             
         $ac_Y = trim($imu_data[1]);                                                                                  
         $ac_Z = trim($imu_data[2]);   
         $g_X = trim($imu_data[3]);
         $g_Y = trim($imu_data[4]);                                                                                 
         $g_Z = trim($imu_data[5]);                                                                                
-        $head = trim($imu_data[6]);  
+        $head = trim($imu_data[6]);         
         $pitch = trim($imu_data[7]);
         $roll = trim($imu_data[8],'#');
-        */
         //echo " IMU:$DIYdistance_LEFT $ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll \n";
-        echo "$DIYdistance_LEFT $DIYdistance $DIYdistance_RIGHT $DIYdistance_DOWN  $DIYleftWheel $DIYrightWheel $DIYtemperature \n";
-         //echo "refr $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" ;
+       // echo "$DIYdistance_LEFT $DIYdistance $DIYdistance_RIGHT $DIYdistance_DOWN  $DIYleftWheel $DIYrightWheel $DIYtemperature \n";
+         //echo "refr $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" 
+} while(floatval($head) <= 0);
 }
 
     
@@ -213,7 +210,7 @@ function non_block_read($fd, &$data) {
     $data = stream_get_line($fd, 1);
     return true;
 }
-
+$flag=1;
 while (!feof($sensors)) {
   
    $x = ""; 
@@ -233,11 +230,11 @@ while (!feof($sensors)) {
             echo "after break";
     }    // Quit on F10
 
-    //sleep(0.01); 
+    sleep(0.01); 
 	refreshDIYData($sensors,$imu);
    // forwardCorrection(); 
   //DOwn 3 dista 12 
-   // $L_O+=$DIYleftWheel; 
+   // $L_O+=$DIYleftWheel;  
   //  $R_O+=$DIYrightWheel; 
     
     //if($LR_O>10)
@@ -246,11 +243,14 @@ while (!feof($sensors)) {
 // ---------------------------------------------------------
 // --------------  car position      -----------------------
 // ---------------------------------------------------------
-		 carscript();  
+		 //carscript();  
+         sleep(0.01);
+         if($flag)
+         {$flag=0;rotate(64,'a');} 
 // ---------------------------------------------------------
 // --------------   write data for cloud -------------------
 // ---------------------------------------------------------
-		// writeCloud();
+		 writeCloud();
 }
 echo "Main loop broke";  
 ?>

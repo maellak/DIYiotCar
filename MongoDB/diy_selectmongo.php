@@ -80,7 +80,7 @@ $app->get('/mongodb', function () use ($authenticateForRole, $diy_storage)  {
         }
 });
 
-function diy_seletc($payload,$storage){
+function diy_select($payload,$storage){
     global $app;
     $result["controller"] = __FUNCTION__;
     $result["function"] = substr($app->request()->getPathInfo(),1);

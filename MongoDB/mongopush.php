@@ -1,10 +1,17 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
+$map_name = "unknown";
+$map_X = 0;
+$map_Y = 0;
+date_default_timezone_set("Europe/Athens");
+setlocale(LC_TIME, 'el_GR.UTF-8');
+
 $context = new ZMQContext();
 $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+echo "getSocket()\n";
 $socket->connect("tcp://127.0.0.1:5556");
-echo "connect\n";
+echo "connect()\n";
 // apo dw ksekinaei
 /*
 // gia test apo edo 
@@ -33,48 +40,85 @@ if(!$socket1)return;
 stream_set_blocking($socket1, 0);
 stream_set_blocking(STDIN, 0);
 do {
-echo "before read\n";
         $read   = array( $socket1, STDIN); $write  = NULL; $except = NULL;
-;
         if(!is_resource($socket1)) return;
-echo "1\n";
         $num_changed_streams = @stream_select($read, $write, $except, null);
-echo "2\n";
         if(feof($socket1)) return ;
-echo "3\n";
         if($num_changed_streams  === 0) continue;
-echo "4\n";
         if (false === $num_changed_streams) {
-echo "5\n";
                 //var_dump($read);
                 $socket->send("Continue\n");
-echo "6\n";
                 die;
         } elseif ($num_changed_streams > 0) {
                 echo "\r";
-echo "7\n";
                 $data = trim(fgets($socket1, 4096));
-echo "8\n";
-	  var_dump($data);
           if($data != "") {
 // edo ftiachete ta data pou erchonte apo to device
 
-echo "data: " . $data ."\n";
-$data = substr($data,1,strlen($data)-2);
-echo "data: " . $data ."\n";;
-          	if(explode("*",$data))
-		{
-echo "9\n";
-			$info = explode("*",$data);
-			$coordinate = array(
-					"posx" => $info[2],
-					"posy" => $info[3]);
-			$entryData = array(
-				"Direction" => $info[0],
-				"Rad" => $info[1],
-				"Coordinates" => $coordinate;
-			$socket->send(json_encode($entryData));
-echo "10\n";
+
+            $data = substr($data,1,strlen($data)-2);
+          	if(explode("*",$data)){
+                $info = explode("*",$data);
+
+                $date = array(
+                    "year" => date("Y"),
+                    "month" => date("m"),
+                    "day" => date("d"),
+                    "hour" => date("H"),
+                    "minutes" => date("i"),
+                    "seconds: " => date("s"));
+
+                $map = array( 
+                    "mapName" => $info[20],
+                    "mapX" => $info[21],
+                    "mapY" => $info[22]);
+
+                $coordinate = array(
+                    "posX" => $info[2],
+                    "posY" => $info[3]);
+
+                $sonars = array(
+                    "rightSonar" => $info[4],
+                    "leftSonar" => $info[5],
+                    "centerSonar" => $info[6],
+                    "bottomSonar" => $info[7]);
+
+                $wheels = array(
+                    "rightWheel" => $info[8],
+                    "leftWheel" => $info[9]);
+
+                $accelerometer = array(
+                    "x" => $info[11],
+                    "y" => $info[12],
+                    "z" => $info[13]);
+
+                $gyroscope = array(
+                    "x" => $info[14],
+                    "y" => $info[15],
+                    "z" => $info[16]);
+
+                $entryData = array(
+                    "SessionStart" => $info[0],
+                    "Direction" => $info[1],
+                    "Coordinates" => $coordinate,
+                    "Sonars" => $sonars,
+                    "Wheels" => $wheels,
+                    "Temperature" => $info[10],
+                    "Accelerometer" => $accelerometer,
+                    "Gyroscope" => $gyroscope,
+                    "Compass" => $info[17],
+                    "Pitch" => $info[18],
+                    "Roll" => $info[19],
+                    "Map" => $map,
+                    "Date&Time" => $date);
+
+                $socket->send(json_encode($entryData));
+                echo "Entry sent\n";
+
+            }
+			
+
+			
 		}
 				
 					

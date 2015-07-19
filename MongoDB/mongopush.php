@@ -40,30 +40,36 @@ if(!$socket1)return;
 stream_set_blocking($socket1, 0);
 stream_set_blocking(STDIN, 0);
 do {
-        $read   = array( $socket1, STDIN); $write  = NULL; $except = NULL;
-        if(!is_resource($socket1)) return;
-        $num_changed_streams = @stream_select($read, $write, $except, null);
-        if(feof($socket1)) return ;
-        if($num_changed_streams  === 0) continue;
-        if (false === $num_changed_streams) {
+    echo "1\n";
+    $read   = array( $socket1, STDIN); $write  = NULL; $except = NULL;
+    echo "2\n";
+    if(!is_resource($socket1))return;
+    echo "3\n";
+    $num_changed_streams = @stream_select($read, $write, $except, null);
+    echo "4\n";
+    if(feof($socket1)) return ;
+    if($num_changed_streams  === 0) continue;
+    if (false === $num_changed_streams) {
                 //var_dump($read);
-                $socket->send("Continue\n");
-                die;
-        } elseif ($num_changed_streams > 0) {
-                echo "\r";
-                $data = trim(fgets($socket1, 4096));
-          if($data != "") {
-// edo ftiachete ta data pou erchonte apo to device
-
-
+        echo "ela\n";
+        $socket->send("Continue\n");
+        die;
+    } elseif ($num_changed_streams > 0) {
+        echo "\r";
+        echo "5\n";
+        $data = trim(fgets($socket1, 4096));
+        echo "6\n";
+        var_dump($data);
+        if($data != "") {
             $data = substr($data,1,strlen($data)-2);
-          	if(explode("*",$data)){
+            if(explode("*",$data)){
                 $info = explode("*",$data);
-
+                echo "--------------------------\n";
+                var_dump($info);
                 $date = array(
                     "year" => date("Y"),
-                    "month" => date("m"),
-                    "day" => date("d"),
+                    "month" => date("n"),
+                    "day" => date("j"),
                     "hour" => date("H"),
                     "minutes" => date("i"),
                     "seconds: " => date("s"));
@@ -114,15 +120,11 @@ do {
 
                 $socket->send(json_encode($entryData));
                 echo "Entry sent\n";
-
             }
-			
+        }
 
-			
-		}
-				
-					
-			
+
+
 
                         //edo ta stelneis gia na egrafoun
                         // choris kamia kathisterissi
@@ -131,7 +133,7 @@ do {
 
 
 
-           }
-     }
+
+    }
 } while(true);
 ?>

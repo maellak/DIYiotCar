@@ -51,7 +51,7 @@ header("Content-Type: text/html; charset=utf-8");
  *                  @SWG\Property(name="status",type="string",description="status of device private/org/public")
  *                  @SWG\Property(name="mode",type="string",description="mode of device devel/production")
  */
-
+//$mongoResult = "maellakia";
 
 //api/get/diy_getdevices.php
 $app->get('/mongodb', function () use ($authenticateForRole, $diy_storage)  {
@@ -92,25 +92,28 @@ function diy_select($payload,$storage){
     $up=json_decode(base64_decode($payload));
     $client_id=$up->client_id;
 
+
     try {
-        $mongoResult = "";
-        //$m = new MongoClient("mongodb://localhost:9999");
+        
         $m = new MongoClient("mongodb://localhost:27017");
         $db = $m->selectDB("diyiot_sensorsData");
         $collection = $db->mycol;
-        switch (n) {
-            case 1:$mongoResult = iterator_to_array($collection->find(array("Map.map_Name" => $map)));
-            case 3:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day)));
-            case 4:$mongoResult = iterator_to_array($collection->find(array("Date&Time.Year" => $year,"Date&Time.Month" => $month,"Date&Time.Day" => $day ,"Map.map_Name" => 
-$map)));
+        switch ((int)$params["operation_id"]) {
+
+            case 1:$mongoResult = iterator_to_array($collection->find(array("Map.mapName" => $params["map_name"])));  break;
+            case 2:$mongoResult = iterator_to_array($collection->find(array("Date&Time.year" => $params["date_year"],"Date&Time.month" => $params["date_month"],
+"Date&Time.day" => $params["date_day"])));  break;
+            case 3:$mongoResult = iterator_to_array($collection->find(array("Date&Time.year" => $params["date_year"],"Date&Time.month" => $params["date_month"],
+"Date&Time.day" => $params["date_day"],"Map.mapName" => $params["map_name"]))); break;
         default:
+            $mongoResult = "Wrong number of arguments";
             
         }
-        //$result["response"] = 
-                $result["message"] = "[".$result["method"]."][".$result["function"]."]: NoErrors";
-                $result["status"] = "200";
-                $result["result"]=  $devices;
-
+        
+        
+        $result["message"] = "[".$result["method"]."][".$result["function"]."]: NoErrors";
+        $result["status"] = "200";
+        $result["result"]=  $mongoResult;
 
     } catch (Exception $e) {
     $diy_error["db"] = $e->getCode();

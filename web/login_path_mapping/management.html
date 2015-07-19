@@ -2,116 +2,140 @@
 <head>
   <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- sb-admin CSS -->
-    <link href="css/sb-admin.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="css/custom.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/DIYiot.css" rel="stylesheet">
 
 <script src="js/pixi.min.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+<script src="js/autobahn.js"></script>
+<script src="js/diy_auto.js"></script>
 <script>
-
-(function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;
-function f(){
-
-// ***************************************************************
-// *********************** $LAB stuff ****************************
-// ***************************************************************
-$LAB.script("js/jquery-2.1.1.js").wait()
-        .script("js/autobahn.js").wait()
-    	.script("js/diy_auto.js").wait()
-    	.script("js/plugins/jquery-ui-1.11.2.custom/jquery-ui.js").wait() 
-    	.script("js/kinetic/kinetic-v5.1.0.js").wait() 
-        .wait(function(){
                 // ***************************************************************
                 // *********************** scripts ok  ***************************
                 // ***************************************************************
          	AUTOBAHN_DEBUG = true;
- 		ab.debug(true);
- 		var diy_o =  new diy_tools();
-        	$(function(){   
+ 		    ab.debug(true);
+ 		    var diy_o =  new diy_tools();
+        	diy_o.access_token = localStorage.getItem("token");
+            function showTree(){   
 			/* 
 			 * ******************************************
 			 * get token and connect to  wss 
 			 * connect is using fro data read from device 
 			 * ******************************************
 			*/  
-                diy_o.access_token = localStorage.getItem("token");
-				var promiseDevices = diy_o.getDevices();
+                var organisation;
+				
+                var promiseDevices = diy_o.getDevices();
                 var promiseOrgs = diy_o.getorgs();
 
+
+                promiseOrgs.success(function (orgs){
                     promiseDevices.success(function (devices) {
-                        promiseOrgs.success(function (orgs){
                         $.each(orgs.result.org, function(i, org){
-                            
                             $('<ul id="org_'+ org.organisation +'" class="list-group" aria-label="'+ org.organisation +'"'+ org.organisation +'">'+ org.organisation +'</ul>').appendTo('#org-container');    
+                               console.log( JSON.stringify(devices));
+                               if(devices != null && devices.result != null && devices.result.dev != null){
                                $.each(devices.result.dev, function(i, item) {
-                                    console.log(item);
-                                    console.log(org);
                                     if(org.organisation === item.organisation){
-                                    $('<li class="list-group-item">'+item.device+'</li>').appendTo('#org_' + item.organisation);
-                                    console.log('Devices:"' + item.device);
+                                    $('<li class="list-group-item" id="id_'+ item.device +'">'+item.device+'</li>').appendTo('#org_' + item.organisation);
+                                    $('<button id="'+ item.device +'" type="button" class="btn btn-danger pull-right delete">Delete</button>').appendTo('#id_'+ item.device);
+                                    $('<div class="btn-group pull-right"><button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Move To <span class="caret"></span></button><ul id="move_' + item.device + '" class="dropdown-menu"></ul></div>').appendTo('#id_'+ item.device);
+                                    $.each(orgs.result.org, function(i, org){
+                                        if(org.organisation !== item.organisation)
+                                            $('<li ><button id="'+ item.device +'" type="button" class="btn btn-default move">'+ org.organisation +'</button></li>').appendTo('#move_' + item.device);
+                                    });
                                     }
                                 });
+                            }
+                            $('<li class="list-group-item" id="addli">Add new device: <button type="button" class="btn btn-success pull-right addDevBtnModal" data-toggle="modal" data-target="#devAddModal" id="' + org.organisation + '">Add</button></li>').appendTo('#org_' + org.organisation);
+                            
                         });
                     });
                 });
-                
+            };
 
-                
-			
-            $(document).on('click', '#diy_auto', function() {
-				var id = $(this).attr('id');
-				var device= id.substr(4)
-				console.log('Devices:' + device);	
-				//.done(function (data) {
-					diy_o.device = device;
-					//diy_o.device = "kittensCategory";
-					diy_o.access_token = data.access_token;
-					diy_o.wss_connect();
-				//});
-			});
-			
-            /*
-            $(document).on('click', '.mpros', function() {
-				var id = $(this).attr('id');
-				promiseToken.done(function (data) {
-					diy_o.access_token = data.access_token;
-					diy_o.device = "auto";
-					diy_o.exec = 'startauto';
-					diy_o.diyexec();
-				});
-			});
-                        $(document).on('click', '.stop', function() {
-                                var id = $(this).attr('id');
-                                promiseToken.done(function (data) {
-                                        diy_o.access_token = data.access_token;
-                                        diy_o.device = "auto";
-                                        diy_o.exec = 'stopauto';
-                                        diy_o.diyexec();
-                                });
-                        });
-        */
-  		});
-                // ***************************************************************
-                // *********************** scripts ok  ***************************
-                // ***************************************************************
-        });
-// ***************************************************************
-// *********************** $LAB stuff  ***************************
-// ***************************************************************
+            function moveDevice(){
+                var orgTo = $(this).text();
+                var name = $(this).attr('id');
+                var move = diy_o.movedevice(name, orgTo);
+                move.success(function (move){
+                    $('#org-container').empty();
+                    showTree();
+                    $('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Success!</strong> Device '+ name +' moved to ' + orgTo + '.</div>').appendTo('#alert-area');
+                });
+            };
 
-}
-H(function(){if("item"in c){if(!c[0]){H(arguments.callee,25);return}c=c[0]}var a=b.createElement("script"),e=false;a.onload=a[E]=function(){if((a[D]&&a[D]!=="complete"&&a[D]!=="loaded")||e){return false}a.onload=a[E]=null;e=true;f()};
-a.src="js/LAB.js";
-c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=function(){b.removeEventListener(F,d,false);b[D]="complete"},false)}})(this,document);
+            function deleteDevice(){
+                var name = $(this).attr('id');
+                var toDelete = diy_o.rmdevice(name);
+                toDelete.success(function (del){
+                    $('#org-container').empty();
+                    showTree();
+                    $('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Warning!</strong> Device '+ name +' deleted.</div>').appendTo('#alert-area');
+                });
+            };
 
+            function createOrg(){
+                var name = $('#newOrgName').val();
+                var desc = $('#newOrgDesc').val();
+                console.log('Warning:' + name + " || " + desc);
+                var addOrg = diy_o.addorg(name, desc);
+                addOrg.success(function (org){
+                    $('#org-container').empty();
+                    showTree();
+                    $('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Success</strong> Organisation '+ name +' added.</div>').appendTo('#alert-area');
+                });
+            }
+
+            function addDevice(org){
+                var deviceOrg = org;
+                var deviceName = $("#newDevName").val();
+                var deviceDesc = $("#newDevDesc").val();
+                var devicePass = $("#newDevPass").val();
+	//check if device name is empty
+		if(deviceName=="")
+			$('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Warning!</strong>  * Device name is empty.</div>').appendTo('#alert-area');
+        
+	//check if device Desc is empty	
+		if(deviceDesc=="")
+			$('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Warning!</strong>  * Description is empty.</div>').appendTo('#alert-area');
+	//check if device Pass is less than 6 digits
+	        if(devicePass.length<6){
+			$('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Warning!</strong>  * Invalid password : Pass should be equal or more than 6 digits.</div>').appendTo('#alert-area');
+	
+		}else{
+		var addDevice = diy_o.adddevice(deviceOrg, deviceName, deviceDesc, devicePass);
+                addDevice.success(function(){
+                    $('#org-container').empty();
+                    showTree();		   
+                    $('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Success</strong> Device '+ deviceName +' added.</div>').appendTo('#alert-area');
+                });
+            };}
+
+
+
+            $(document).ready(showTree);
+
+            $(document).on('click', '.addDevBtnModal', function(){
+                var org = $(this).attr('id');
+                if($('.newDevBtn').length > 0){
+                    $('.newDevBtn').remove();
+                }
+
+                $('<button class="btn btn-lg btn-primary btn-block newDevBtn" type="button" id="'+ org +'" data-dismiss="modal">Submit</button>').appendTo('#addDevDiv');
+            });
+
+            $(document).on('click', '.newDevBtn', function(){
+                var org = $(this).attr('id');
+                addDevice(org);
+            });
+
+            $(document).on('click', '#newOrgBtn', createOrg);
+
+            $(document).on('click', '.move', moveDevice);
+
+            $(document).on('click', '.delete', deleteDevice);          
 
 </script>
 
@@ -139,7 +163,7 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
                         <a href="home.html">Home</a>
                     </li>
                     <li>
-                        <a href="auto.html">DIYiot Car Control Panel</a>
+                        <a href="auto.html">Device Control Panel</a>
                     </li>
                     <li>
                         <a href="management.html">Manage devices</a>
@@ -158,15 +182,83 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
 
 	<!-- Page Heading -->
 	<div class="row">
-		<div class="col-lg-12">
+		<div class="col-lg-8">
 			<h1 class="page-header">
 				Manage users and devices.
 			</h1>
-	  </div>
+        </div>
 	</div>
+    <div class="row"> 
+        <div class="col-lg-8">
+            <div class="container">
+              <h2>Add organisation</h2>
+              <!-- Trigger the modal with a button -->
+              <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add</button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Add new Organisation</h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                      <div class="col-sm-6 col-md-4 col-md-offset-4">
+                            
+                                <input type="text" class="form-control" placeholder="Name" id="newOrgName"required autofocus>
+                                <input type="text" class="form-control" placeholder="Description" id="newOrgDesc" required>
+                                <button class="btn btn-lg btn-primary btn-block" type="button" id="newOrgBtn" data-dismiss="modal">Submit</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+              
+            </div>    
+        </div>
+        
+        <div class="modal fade" id="devAddModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Add new Device</h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                      <div class="col-sm-6 col-md-4 col-md-offset-4" id="addDevDiv">
+                            
+                                
+                                <input type="text" class="form-control" placeholder="Name" id="newDevName"required autofocus>
+                                <input type="text" class="form-control" placeholder="Description" id="newDevDesc" required>
+                                <input type="text" class="form-control" placeholder="Pass" id="newDevPass"required>
+                                
+
+
+                                
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
 
     <div class="row">
-        <div class="col-lg-12">
+        <div id="alert-area" class="col-lg-12">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
             <div id="org-container" class="nav nav-tabs">
             </div>
         </div>

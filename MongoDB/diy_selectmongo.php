@@ -80,7 +80,7 @@ $app->get('/mongodb', function () use ($authenticateForRole, $diy_storage)  {
         }
 });
 
-function diy_select($payload,$storage){
+function diy_seletc($payload,$storage){
     global $app;
     $result["controller"] = __FUNCTION__;
     $result["function"] = substr($app->request()->getPathInfo(),1);
@@ -116,9 +116,9 @@ function diy_select($payload,$storage){
         $result["result"]=  $mongoResult;
 
     } catch (Exception $e) {
-    $diy_error["db"] = $e->getCode();
-    $result["status"] = $e->getCode();
-    $result["message"] = "[".$result["method"]."][".$result["function"]."]:".$e->getMessage();
+	$diy_error["db"] = $e->getCode();
+	$result["status"] = $e->getCode();
+	$result["message"] = "[".$result["method"]."][".$result["function"]."]:".$e->getMessage();
     }
 
         if(diyConfig::read('debug') == 1){

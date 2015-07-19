@@ -68,8 +68,23 @@ $LAB.script("js/jquery-2.1.1.js").wait()
                 diy_o.access_token = data.access_token;
                 
                 localStorage.setItem("token", data.access_token);
-                    if(localStorage.getItem("token") !== null)    
-                        window.location = "home.html";
+		 if(user!=""&pass!=""){
+                    if(localStorage.getItem("token") !== null&data.access_token!==undefined)   
+                               window.location = "home.html";
+                
+                    if(data.access_token===undefined)
+                           document.getElementById("errorMsg").innerHTML="*Invalid username/password";
+                  }else{
+                            if(user==""&pass!=""){
+                                 document.getElementById("errorMsg").innerHTML="*Please type your username";
+                            }else if(user!=""&pass==""){
+                                 document.getElementById("errorMsg").innerHTML="*Please type your password";
+                            }else{
+                                document.getElementById("errorMsg").innerHTML="* Please fill in the forms";
+                            }
+                  }
+
+
                 })        
             });
             
@@ -103,7 +118,8 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
                     Sign in</button>
             </div>
             <a href="register.html" class="text-center new-account">Register</a>
-        </div>
+     	    <p style="color:red" id="errorMsg"></p>
+	    </div>
     </div>
 </div>
 

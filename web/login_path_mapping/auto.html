@@ -2,19 +2,12 @@
 <head>
   <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- sb-admin CSS -->
-    <link href="css/sb-admin.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="css/custom.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
+    <link href="css/DIYiot.css" rel="stylesheet">
+    
 <script src="js/pixi.min.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+
 <script>
 
 (function(g,b,d){var c=b.head||b.getElementsByTagName("head"),D="readyState",E="onreadystatechange",F="DOMContentLoaded",G="addEventListener",H=setTimeout;
@@ -51,7 +44,8 @@ $LAB.script("js/jquery-2.1.1.js").wait()
 						//$("[name='deviceselection']").append('<option value='+item.device+'>'+item.device+'</option>');
 					});
 				});
-			
+
+
             $(document).on('click', '#diy_auto', function() {
 			//$("#gobutton").on('click', function() {
 				//var id = "diy_" + $("[name='deviceselection']").val(); //$(this).attr('id');
@@ -62,7 +56,7 @@ $LAB.script("js/jquery-2.1.1.js").wait()
 				//.done(function (data) {
 					diy_o.device = device;
 					//diy_o.device = "kittensCategory";
-					diy_o.access_token = data.access_token;
+					diy_o.access_token = localStorage.getItem("token");
 					diy_o.wss_connect();
 				//});
 			});
@@ -128,7 +122,7 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
                         <a href="home.html">Home</a>
                     </li>
                     <li>
-                        <a href="auto.html">DIYiot Car Control Panel</a>
+                        <a href="auto.html">Device Control Panel</a>
                     </li>
                     <li>
                         <a href="management.html">Manage devices</a>
@@ -164,6 +158,43 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
 	
     <div id="commands" class="commands">
        <div id="commands-group" class="btn-group" role="group">
+       <div class="row"> 
+        <div class="col-lg-8">
+            <div class="container">
+              <h2>Request data: </h2>
+              <!-- Trigger the modal with a button -->
+              <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Add</button>
+
+              <!-- Modal -->
+              <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Add new Organisation</h4>
+                      <input type="radio" name="group1" class="radionBtn" id="radioMap">Map</input>
+                      <input type="radio" name="group1" class="radionBtn" id="radionDate">Date</input>
+                      <input type="radio" name="group1" class="radionBtn" id="radioMapAndDate">Map & Date</input>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                      <div class="col-sm-6 col-md-4 col-md-offset-4 mongoModal">
+                            
+                                <input type="text" class="form-control" placeholder="Name" id="newOrgName"required autofocus>
+                                <input type="text" class="form-control" placeholder="Description" id="newOrgDesc" required>
+                                <button class="btn btn-lg btn-primary btn-block" type="button" id="newOrgBtn" data-dismiss="modal">Submit</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+              
+            </div>    
+        </div>
        </div>
     </div>
 	
@@ -204,7 +235,7 @@ c.insertBefore(a,c.firstChild)},0);if(b[D]==null&&b[G]){b[D]="loading";b[G](F,d=
 // ** * * * * * * * * Streaming * ** * * * * * * * *  ** * * * * 
 function OpenCamera(){
 
-window.open("http://195.130.109.89:1234/javascript_simple.html","Stream","height=250,width=350");
+window.open("http://195.130.109.89:12345/javascript_simple.html","Stream","height=250,width=350");
 if (window.focus) {newwindow.focus()}
     return false;
 }
@@ -357,16 +388,17 @@ function runCanvas(){
         
         
         //Set car position on each animation pass
-        var str = document.getElementById('dataDev1').textContent;
+        var str = document.getElementById('dataDev').textContent;
         //*********************************************************************************************
         
          //str = xx +"*"+yy;
+        console.log(str);
         var parsed = str.split('*');
 
-        var rotation = Math.atan2((parsed[0] - lastFrame.x), (parsed[1] - lastFrame.y)*(-1));
+        var rotation = Math.atan2((parsed[2] - lastFrame.x), (parsed[3] - lastFrame.y)*(-1));
         // rotation += Math.PI;
 
-        currentFrame = {"x" : parsed[0], "y" : parsed[1], "rotation" : rotation};
+        currentFrame = {"x" : parsed[2], "y" : parsed[3], "rotation" : rotation};
 
         if ((lastFrame.x != currentFrame.x) || (lastFrame.y != currentFrame.y))
         {

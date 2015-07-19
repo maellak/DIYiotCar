@@ -11,19 +11,27 @@ function writeCloud(){
        	//DIYdirection       w,s,a,d                                                                        
        	//DIYposx       x thessi               
        	//DIYposy       y thessi                               
-       	$DIYdirection = trim($GLOBALS['curDirection']);
+       	// fopen for write data cloud                                                                            
+if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){            
+	echo "Cannot link with cloud, wrong usb connected";                    
+	exit;                                                                   
+}     
+        
+        $DIYdirection = trim($GLOBALS['curDirection']);
        	$DIYposx = trim($GLOBALS['posx']);
        	$DIYposy = trim($GLOBALS['posy']);     
        	$DIYcloud = "@$time*$DIYdirection*$DIYposx*$DIYposy";//$time 4
         $DIYcloud .= "*$DIYdistance_LEFT*$DIYdistance*$DIYdistance_RIGHT*$DIYdistance_DOWN*$DIYleftWheel*$DIYrightWheel*$DIYtemperature"; //7
         $DIYcloud .= "*$ac_X*$ac_Y*$ac_Z*$g_X*$g_Y*$g_Z*$head*$pitch*$roll";//9
-        $DIYcloud .= "*Map_Name1*100*100#" ;//3
+        $DIYcloud .= "*".MAP_NAME."*".BOUNDARY_X."*".BOUNDARY_Y."#";//3
         $DIYcloud .= "\n";     
-        //echo "CLOUD --  $DIYcloud\n"; 
-	$p=$GLOBALS['DIYpipecloud'];
-	fwrite($p, $DIYcloud."\n");  
+        echo "CLOUD --  $DIYcloud\n"; 
+	//$p=$GLOBALS['DIYpipecloud'];
+	$p = $DIYpipecloud;
+    fwrite($p, $DIYcloud."\n");  
+    
 }
-
+ 
 // ************************************************
 // ***************** function motion move *********
 // ************************************************
@@ -32,12 +40,7 @@ function writeCloud(){
 function forward()
 {
 	global $serial, $curDirection;
-	// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
-	//if($curDirection != 0){
-	//	echo "allagfhgfhgfhgfhgfhgf $curDirection ";
-	//	stopBeforeCD('w', $curDirection);
-	//}
-
+	
 	if($curDirection != 'w'){ 
     echo "MPHKA FORWARD!!!!!!!!!!";
 		sleep(0.01);
@@ -82,7 +85,7 @@ function backward()
 	//// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
 	//stopBeforeCD('s', $curDirection);
 
-    /*
+    /* 
 	if($curDirection != 's'){
 		echo "backkkkkkkkkkkkk";
 		$curDirection = 's';
@@ -132,7 +135,7 @@ function rotate($m,$d){
             $curDirection = $d;           
             if($wantedMoires <0)
             $wantedMoires = 360 + $wantedMoires;
-            sleep(0.01);
+            //sleep(0.01);
             $exec = "@a060:063#";
             $serial->deviceOpen();                      
             $serial->sendMessage($exec);                

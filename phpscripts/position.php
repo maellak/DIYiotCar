@@ -8,24 +8,20 @@ $posy = 0;
 $nextPosy = 0;
 define ('DEGREES_BETWEEN_DOTS', 36); 
 define('CAR_WHEEL_RADIUS', 3);
-define('BOUNDARY_X', 101);
-define('BOUNDARY_Y', 101);
 define('OBSTACLE', 12);
 define('GROUND_DISTANCE', 4);
 $carIsRunning=TRUE;
 
 function recalculateCoordinates() {
-	global $curMove, $direction;
+	global $curDirection, $head;
 	global $posx, $posy, $nextPosx, $nextPosy;
-
-	if($curMove == 'w') {
-
-		$nextPosx = $posx + CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*sin(deg2rad($direction));
- 		$nextPosy = $posy + CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*cos(deg2rad($direction));
+	if($curDirection == 'w') {
+		$nextPosx = $posx + CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*sin(deg2rad($head));
+ 		$nextPosy = $posy + CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*cos(deg2rad($head));
 	
-	} elseif($curMove == 's') {
-		$nextPosx = $posx - CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*sin(deg2rad($direction));
-		$nextPosy = $posy - CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*cos(deg2rad($direction));
+	} elseif($curDirection == 's') {
+		$nextPosx = $posx - CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*sin(deg2rad($head));
+		$nextPosy = $posy - CAR_WHEEL_RADIUS*deg2rad(DEGREES_BETWEEN_DOTS)*cos(deg2rad($head));
 		$direction = $direction + 160;
 	}
 }
@@ -40,30 +36,31 @@ function movementLogic() {
  $curMove, $direction, $DIYdistance_LEFT, $DIYdistance, $DIYdistance_RIGHT, $carIsRunning;
 	//echo "logic";
 	//echo $carIsRunning;
-   // echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunning \n" ;
+   // echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunningyyy \n" ;
+      
 		if ( $carIsRunning ) { 
 			//echo " forward ";
 			if (  (  $DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE && $DIYdistance >= OBSTACLE ) && ( ($curMove != 's') && ($curMove != 'a') && ($curMove != 'd') ) ){	
                 forward();//
-				$carIsRunning = TRUE;
+                $carIsRunning = TRUE;
 			} 
             else if(  $DIYdistance_RIGHT < OBSTACLE && $DIYdistance_LEFT < OBSTACLE && $DIYdistance < OBSTACLE )
             {
                 backward();
                 $carIsRunning = TRUE;
             }          
-           elseif (($curMove != 'a' && $curMove != 'd') && ($DIYdistance_LEFT > $DIYdistance_RIGHT) && ($DIYdistance_LEFT > OBSTACLE)){ 
+           /*elseif (($curMove != 'a' && $curMove != 'd') && ($DIYdistance_LEFT > $DIYdistance_RIGHT) && ($DIYdistance_LEFT > OBSTACLE)){ 
 				rotate(64,'a');//left(); 
                 //stop();
 				$carIsRunning = TRUE;
-
+ 
 			}                       
             elseif (($curMove != 'd' && $curMove != 'a') && ($DIYdistance_LEFT < $DIYdistance_RIGHT) && ($DIYdistance_RIGHT > OBSTACLE))
             { 
 				rotate(64,'d');//right();
                 //stop();
 				$carIsRunning = TRUE;
-			}
+			}*/
         /*   
         elseif ( ($DIYdistance_RIGHT <= OBSTACLE) && ($DIYdistance_LEFT <= OBSTACLE) && ($DIYdistance <= OBSTACLE) ) {				
 				stop();
@@ -76,7 +73,7 @@ function movementLogic() {
 				//stop();//backward(); //prosorina
 				//echo "Brhka empodio\n";
 				$carIsRunning = TRUE;//FALSE;
-			}
+			} 
 
 			
 		}       
@@ -100,15 +97,13 @@ function carscript() {
 	}
 	$prevDIYLeftWheel = $DIYleftWheel;
 
-	if($nextPosx < 0 || $nextPosx > BOUNDARY_X || $nextPosy < 0 || $nextPosy > BOUNDARY_Y){
+	/*
+    if($nextPosx < 0 || $nextPosx > BOUNDARY_X || $nextPosy < 0 || $nextPosy > BOUNDARY_Y){
 		// Out of boundary. Handle same as obstacle.
 		echo "It has to stop and rotate" . $direction . "!!";
 		
-		
-		rotateLeft(160);
-		$direction = $direction + 160;
-		$carIsRunning = TRUE;
-
+		rotate(160,'a');
+		//$carIsRunning = TRUE; 
 		movementLogic();
 		recalculateCoordinates();
 		echo "Rotated... in bounds again";
@@ -116,11 +111,12 @@ function carscript() {
 
 		
 	} else {
+        */
 		// we are still inside the boundary. Update posx and posy and execute normal logic.
 		$posx = $nextPosx;
 		$posy = $nextPosy;
 		movementLogic();		
-	} 
+	//} 
 	//var_dump($posx.' '.$posy.' '.$DIYleftWheel.' '.$prevDIYLeftWheel);
    //echo " Dir= $curDirection ";
 	

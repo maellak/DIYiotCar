@@ -1,2 +1,5 @@
 #!/bin/sh
-/root/phpscripts/controller.php
+echo 1 > /tmp/controller.run
+/root/phpscripts/controller.php -mabc -x101 -y101
+
+

@@ -1,0 +1,1139 @@
+<html>
+<head>
+  <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/DIYiot.css" rel="stylesheet">
+    
+<script src="js/pixi.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/autobahn.js"></script>
+<script src="js/diy_auto.js"></script>
+<script>
+                // ***************************************************************
+                // *********************** scripts ok  ***************************
+                // ***************************************************************
+            AUTOBAHN_DEBUG = true;
+            ab.debug(true);
+            var diy_o =  new diy_tools();
+            diy_o.access_token = localStorage.getItem("token");
+            function createDropdown(){   
+            /* 
+             * ******************************************
+             * get token and connect to  wss 
+             * connect is using fro data read from device 
+             * ******************************************
+            */  
+                var organisation;
+                
+                var promiseDevices = diy_o.getDevices();
+                var promiseOrgs = diy_o.getorgs();
+
+
+                promiseOrgs.success(function (orgs){
+                    
+                    promiseDevices.success(function (devices) {
+                        $.each(orgs.result.org, function(i, org){
+                               $('<li class="dropdown-header" id="id_'+ org.organisation +'">Organisation: '+ org.organisation +'</li>').appendTo('.dropdown-menu');
+                               console.log( JSON.stringify(devices));
+                               if(devices != null && devices.result != null && devices.result.dev != null){
+                               $.each(devices.result.dev, function(i, item) {
+                                    if(org.organisation === item.organisation){
+                                    $('<li><button id="'+ item.device +'" type="button" class="btn btn-default selectDevice" onclick="runCanvas()">'+item.device+'</li>').appendTo('.dropdown-menu');
+                                    
+                                    }
+                                });
+                            
+                            }
+                        });
+                    });
+                });
+            };
+
+            function startStopDevice(){
+                
+                var mapName = $('#startStopMapName').val();
+                var x = $('#startStopMapX').val();
+                var y = $('#startStopMapY').val();
+                var num = 1;
+                var device = $('.modalBtn').attr('id');
+                var exec = $(this).attr('id');
+                console.log(exec);
+                var command = diy_o.diyexec(device, num, exec, mapName, x, y);
+                command.success(function (){
+                    console.log("command sent");
+                });
+            };
+
+            function openDevicePanel(){
+                var id = $(this).attr('id');
+                diy_o.device = id;
+                diy_o.access_token = localStorage.getItem("token");
+                diy_o.wss_connect();
+                drawDeviceButtons(id);
+            };
+
+            function drawDeviceButtons(id){
+                $('#commands-group').empty();
+                $('<button type="button" class="btn btn-default modalBtn" data-toggle="modal" data-target="#startStopModal" id="' + id +'">Start/Stop</button>').appendTo('#commands-group');
+                $('<button type="button" class="btn btn-default" id="streamButton" onClick="OpenCamera()">Camera</button>').appendTo('#commands-group');
+                $('<button type="button" class="btn btn-default" onClick="runCanvas()">Real Data</button>').appendTo('#commands-group');
+                $('<button type="button" class="btn btn-default" onClick="runDummyCanvas()">Dummy Data</button>').appendTo('#commands-group');
+            }
+
+            $(document).ready( createDropdown );
+
+            $(document).on('click touch start', '.selectDevice', openDevicePanel);
+
+            $(document).on('click touch start', '.commandBtn', startStopDevice);
+
+</script>
+
+</head>
+<body>
+<div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="home.html">DIYiot Project</a>
+            </div>
+            
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li>
+                        <a href="home.html">Home</a>
+                    </li>
+                    <li>
+                        <a href="auto.html">Device Control Panel</a>
+                    </li>
+                    <li>
+                        <a href="management.html">Manage devices</a>
+                    </li>
+                    <li>
+                        <div id="logout">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+<div id="page-wrapper">
+
+	<div class="container-fluid">
+
+	<!-- Page Heading -->
+	<div class="row">
+		<div class="col-lg-12">
+			<h1 class="page-header">
+				Devices
+			</h1>
+	  </div>
+	</div>
+
+	<div id="devices" class="devices">
+	   <p>Please select device:
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Devices
+            <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+            </ul>
+  </div>
+</div>
+    </div>
+	<br />
+	
+    <div id="commands" class="commands">
+       <div class="row">
+           <div class="col-lg-offset-2 col-lg-8">
+            <div id="commands-group" class="btn-group" role="group">
+            </div>
+            </div>
+	   </div>
+       <div class="row"> 
+        <div class="col-lg-8">
+            <div class="container">
+              <!-- Trigger the modal with a button -->
+
+              <!-- Modal -->
+              <div class="modal fade" id="startStopModal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                      <h4 class="modal-title">Start or stop car.</h4>
+                    </div>
+                    <div class="modal-body">
+                      <div class="row">
+                      <div class="col-sm-6 col-md-4 col-md-offset-4 mongoModal">
+                            
+                                <input type="text" class="form-control" placeholder="Map name" id="startStopMapName"required autofocus>
+                                <input type="text" class="form-control" placeholder="X position" id="startStopMapX" required>
+                                <input type="text" class="form-control" placeholder="Y position" id="startStopMapY" required>
+                                <button class="btn btn-lg btn-primary btn-block commandBtn" type="button" id="start" data-dismiss="modal">Start</button>
+                                <button class="btn btn-lg btn-primary btn-block commandBtn" type="button" id="stop" data-dismiss="modal">Stop</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+              
+            </div>    
+        </div>
+       </div>
+    <div class="row">
+        <div class="col-lg-offset-2 col-lg-8" id="canvas"></div>
+    </div>
+	<div id="dataDev" class="dataDev table-responsive" style="display: none;">
+		<table class="table table-hover">
+			<thead id="listheaders" style="font-weight: bold;">
+			</thead>
+			<tbody id="listtable">
+			</tbody>
+		</table>
+	</div>
+	<div id="dataDev1" class="dataDev1 table-responsive" style="display: none;">
+    </div>
+	
+	
+	</div>
+			  
+			  
+</div>
+</div>
+<script>
+
+    if(localStorage.getItem("token") === null)
+        window.location = "index.html";
+    else
+        document.getElementById('logout').innerHTML = '<button type="button" class="btn btn-default" onclick="logout()">Logout</button>';
+
+    function logout(){
+        localStorage.removeItem("token");
+        window.location = "index.html";
+    }
+
+</script>
+<script>
+// ** * * * * * * * * Streaming * ** * * * * * * * *  ** * * * * 
+function OpenCamera(){
+
+window.open("http://195.130.109.89:12345/javascript_simple.html","Stream","height=250,width=350");
+if (window.focus) {newwindow.focus()}
+    return false;
+}
+</script>
+
+<script>
+function runCanvas(){
+
+    document.getElementById('canvas').innerHTML = "";
+    var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
+    document.getElementById('canvas').appendChild(renderer.view);
+
+   
+    var stage = new PIXI.Container(),
+	     tracks = new PIXI.Container (),
+	     path = new PIXI.Container (),
+	     obstacles = new PIXI.Container (),
+	     panel = new PIXI.Container ();
+		 
+		stage.interactive = true;
+	    panel.interactive = true;
+	    //path.interactive = false; // gia arxi
+		
+	var pointMeshX=[0]; // o pinakas me ta path points!!!!!!!!!!!!!!!!!111
+	var pointMeshY=[0];
+	
+		// create a texture from an image path
+    var texture = PIXI.Texture.fromImage('img/car.png');
+	var pointTexture = PIXI.Texture.fromImage('img/point.png');
+	
+
+
+    // create a new Sprite using the texture
+    var car = new PIXI.Sprite(texture);
+    car.interactive = true;
+    car.buttonMode = true;
+    car.anchor.x = 0.5;
+    car.anchor.y = 0.5;
+	// setup events
+    car.on('click', showTrack);
+    car.on('tap', showTrack);
+	car.on ("rightclick", clearTrack);
+	
+		
+	
+	// set scale for the car  sto telos DEN 8a to 8eloume!!!!!!!!!!!!!!!!!
+	car.scale.x = car.scale.y = 0.8;
+		
+    car.position.x = 200;
+    car.position.y = 150;
+	car.rotation = 0;
+    //add car to stage
+    stage.addChild(car);
+	
+// path Areaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	 var pathArea = new PIXI.Graphics (); // clickable area.....
+	pathArea.lineStyle(0);
+    pathArea.beginFill(0x000000, 0.2); // ligo pio aspro
+    pathArea.drawRect (0, 0, 800, 600);
+	pathArea.visible=false;
+	pathArea.interactive = false;
+	
+		pathArea
+		.on("mousedown", pathAreaClick)
+		.on('touchstart', pathAreaClick);
+		
+	path.addChildAt(pathArea, 0);
+	
+
+
+	
+	var pathLine = new PIXI.Graphics();
+	path.addChildAt(pathLine,1); // *****************************************
+	
+	stage.addChild (path);   // add to main stage
+	
+	var editIndex = 0; // gia na doume poio kounietai...
+
+    
+	
+	
+	// 2 empodia proxeiro*********************************
+	var graphics2 = new PIXI.Graphics();
+	graphics2.lineStyle(1, 0x000000);
+	graphics2.beginFill(0xFF700B, 1);
+	graphics2.drawCircle(450, 100,20);
+	//graphics2.drawCircle(300, 90,5);
+    graphics2.endFill();
+	
+	obstacles.addChild(graphics2);
+	// add obstacles to stage
+	stage.addChild (obstacles); 
+	
+	// tracks****************************************
+	var graphics3 = new PIXI.Graphics();
+	graphics3.lineStyle(1, 0x000000);
+	graphics3.beginFill(0xFFFF0B, 0.5);
+	
+	// tracks.addChild(graphics3);
+	stage.addChild (tracks); //******************************************
+	
+	
+	// panel 2 buttons sto panel >stage .container !!! gia visible +/-
+	var btnSet = new PIXI.Graphics();
+	var btnSend = new PIXI.Graphics();	
+		
+	var btnText = new PIXI.Text("Set", {font:"20px Arial", fill:"red"});
+	btnText.x = 690;
+	btnText.y = 15;
+
+	btnSet.lineStyle (2, 0xFF00FF, 1);
+	btnSet.beginFill (0x006600, 0.25);
+	btnSet.drawRoundedRect(680, 10, 50, 40, 15);
+	btnSet.endFill();
+	panel.addChild(btnText);
+	panel.addChild(btnSet);
+	
+	btnSet.interactive = true;
+	
+	btnSet.click=function(mouseData)
+	{
+		console.log("Start an Set!");	
+		this.alpha = 1;
+			path.interactive = true;
+			pathArea.interactive= true;
+			pathArea.visible = true;
+			
+			
+
+	}
+	
+	btnSet.mousedown=function(mouseData)
+	{
+	if (pointMeshX.length>2) { 
+		path.removeChildren (2, pointMeshX.length+2);
+	}	
+		// path.reseting 
+		//for (var i = 2; i < pointMeshX.length; i++) 
+      //{   
+	  console.log("removing.....");
+	//	path.removeChil(i);
+     // }
+	 pointMeshX.length = 0;
+	 pointMeshY.length = 0;
+	  	
+		this.alpha = 0.25;
+		drawPath();
+		//renderer.render(path);
+	}
+
+	var btnText = new PIXI.Text("Send", {font:"20px Arial", fill:"red"});
+	btnText.x = 740;
+	btnText.y = 15;
+
+	btnSend.lineStyle (2, 0xFF00FF, 1);
+	btnSend.beginFill (0xFF00BB, 0.25);
+	btnSend.drawRoundedRect(740, 10, 50, 40, 15);
+	btnSend.endFill();
+	panel.addChild(btnText);
+	panel.addChild(btnSend);
+	
+	btnSend.interactive = true;
+	
+	btnSend.click=function(mouseData)
+	{
+		console.log("Clear and Send!");
+		this.alpha = 1;
+		//anchorP.interactive = false;
+        //anchorP.buttonMode = false;
+		pathArea.interactive = false;
+		pathArea.visible = false;
+		path.interactive = false;
+		
+		
+		
+		//EMPTYING ARRAY ------> pointMesh.length = 0; oxi asto na fainontai.... mono false
+	 
+	}  
+	
+	btnSend.mousedown=function(mouseData)
+	{
+		this.alpha = 0.25;
+	}
+	
+  stage.addChild (panel);   // add to main stage
+  // stage.addChild (path);
+ 
+//***************************************************************************************************************** 
+   
+  
+    //array that holds info for all frames
+    var frameBuffer = {};
+
+    //object that holds info for current frame
+    var frame = {
+        x: 0, 
+        y: 0,
+        rotation: 0
+    };
+
+    //first frame
+    frameBuffer[0] = { "x" : car.position.x,  "y" : car.position.y, "rotation" : car.rotation};
+
+    //set first frame to last frame for the first run
+    var lastFrame;
+    lastFrame = frameBuffer[0];
+    var currentFrame;
+    //start count from 1
+    var count = 1;
+
+
+	
+	// my DUMMY DATA**********************************************************************
+	var carMove = false;                  // for demo ONLY*****************************
+	var xx1 = 0 ;
+	var yy1 = 0;
+	var xx2=0;
+	var yy2=0;
+	var xx=0;
+	var yy=0;
+	var step = 0;
+	var gonia=0;
+	var str = "dummy";
+	var indexx = 0;
+	var carPath = {x:0, y:0};   //index [0]
+	
+	
+	function showTrack () // car button****************************************
+{
+ 	tracks.visible= !tracks.visible;
+}
+
+	function clearTrack () // car button clear tracks****************************************
+{
+ 	graphics3.clear();
+}
+
+
+/*
+function cancelClick ()
+{
+ 	carPath.length = 0; // empting the path array
+//	stage.removeChild(path); //mporei na 8elei mono index no.....
+}
+
+*/
+  //  animate();
+	requestAnimationFrame( animate );
+	
+
+
+	//******************************* functions **************************************************************************************
+function pathAreaClick(event)
+	{
+	console.log ("Add new path point!!!");
+	this.data = event.data;
+     var newPosition = this.data.getLocalPosition(this.parent);
+     createAnchor(Math.floor(newPosition.x), Math.floor(newPosition.y)); 
+// 	 console.log(newPosition.x, newPosition.y); // GIATI mono to x dekadikoooooo GIATI?????
+//     this.data = null;
+	}
+	
+	
+	
+function createAnchor(x, y)
+{
+    var  anchorP = new PIXI.Sprite(pointTexture);
+  
+	pointMeshX.push(x);
+    pointMeshY.push(y);
+
+console.log("Length: "+pointMeshX.length + "  X: "+pointMeshX[pointMeshX.length-1] +"    Y:  "+pointMeshY[pointMeshY.length-1]);
+  
+     anchorP.interactive = true;
+     anchorP.buttonMode = true;
+     anchorP.anchor.set(0.5);
+
+
+    // setup events
+     anchorP
+        // events for drag start
+        .on('mousedown', onDragStart)
+        .on('touchstart', onDragStart)
+        // events for drag end
+        .on('mouseup', onDragEnd)
+        .on('mouseupoutside', onDragEnd)
+        .on('touchend', onDragEnd)
+        .on('touchendoutside', onDragEnd)
+        // events for drag move
+        .on('mousemove', onDragMove)
+        .on('touchmove', onDragMove);
+
+    // move the sprite to its designated position
+     anchorP.position.x = x;
+     anchorP.position.y = y;
+
+    // add it to the stage
+    path.addChildAt(anchorP,pointMeshX.length+1); //*******************
+    //path.addChild(pathArea);
+	// stage.addChild (path);
+  //  renderer.render(path);
+	drawPath();
+  
+   
+}
+
+
+function onDragStart(event)
+{
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true; 
+  	editIndex = path.getChildIndex(this);
+    console.log("item id "+path.getChildIndex(this)+"  X="+pointMeshX[editIndex-2]);
+
+}
+
+function onDragEnd()
+{
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+  	editIndex = 0;
+  	drawPath();
+  	
+}
+
+function onDragMove()
+{
+    if (this.dragging)
+    {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+      pointMeshX[editIndex-2] = Math.floor(newPosition.x);
+      pointMeshY[editIndex-2] = Math.floor(newPosition.y);
+	  
+           
+    }
+}
+
+
+
+function drawPath() 
+{
+	pathLine.clear(); 
+	if (pointMeshX.length > 1)  
+	{
+	
+	 
+	 pathLine.lineStyle(2, 0x33FF00);
+	// path.removeChildAt(1);
+  		  
+    
+	  console.log ("path points: "+ pointMeshX.length); 
+	    
+      pathLine.moveTo(pointMeshX[0],pointMeshY[0]);
+	  console.log(pointMeshX[0],pointMeshY[0]);
+       
+      for (var i = 1; i < pointMeshX.length; i++) 
+       {  
+			  
+        pathLine.lineTo(pointMeshX[i],pointMeshY[i]); 
+		pathLine.moveTo(pointMeshX[i],pointMeshY[i]); // bug in pixi.js !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		console.log(pointMeshX[i],pointMeshY[i]);
+       }
+    //path.addChildAt(pathLine, 1);  
+    }
+	    
+}
+
+
+// ************************************************ LOOPA *******************************************	
+    function animate() {
+	
+        requestAnimationFrame(animate);
+		graphics3.lineStyle(1, 0x000000);
+		graphics3.beginFill(0xFFFF0B, 0.5);
+		
+				
+		
+        //Set car position on each animation pass
+       var str = document.getElementById('dataDev').textContent;
+		//******************************my Dummy Data Generator *********************************************
+	    
+		console.log(str);
+        var parsed = str.split('*');
+
+        var rotation = Math.atan2((parsed[0] - lastFrame.x), (parsed[1] - lastFrame.y)*(-1));
+      
+        currentFrame = {"x" : parsed[0], "y" : parsed[1], "rotation" : rotation};
+
+        if ((lastFrame.x != currentFrame.x) || (lastFrame.y != currentFrame.y))
+        {
+
+         frameBuffer[count] = currentFrame;
+        
+         car.position.x = currentFrame.x;
+         car.position.y = currentFrame.y;
+         car.rotation = rotation;
+	
+		 graphics3.drawCircle(~~currentFrame.x, ~~currentFrame.y, 2);
+			
+		 tracks.addChild(graphics3);
+		
+         renderer.render(stage);
+		 //renderer.render(path);
+         lastFrame = currentFrame;	
+        }		
+		
+		
+		renderer.render(stage);
+    }	
+    }
+    //function onDragStart(event)
+    
+	function runDummyCanvas(){
+	
+    document.getElementById('canvas').innerHTML = "";
+	var renderer = PIXI.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
+    document.getElementById('canvas').appendChild(renderer.view);
+
+   
+    var stage = new PIXI.Container(),
+	     tracks = new PIXI.Container (),
+	     path = new PIXI.Container (),
+	     obstacles = new PIXI.Container (),
+	     panel = new PIXI.Container ();
+		 
+		stage.interactive = true;
+	    panel.interactive = true;
+	    //path.interactive = false; // gia arxi
+
+	var carMove = 0; 
+		
+	var pointMeshX=[0]; // o pinakas me ta path points!!!!!!!!!!!!!!!!!111
+	var pointMeshY=[0];
+	
+		// create a texture from an image path
+    var texture = PIXI.Texture.fromImage('img/car.png');
+	var pointTexture = PIXI.Texture.fromImage('img/point.png');
+	
+
+
+    // create a new Sprite using the texture
+    var car = new PIXI.Sprite(texture);
+    car.interactive = true;
+    car.buttonMode = true;
+    car.anchor.x = 0.5;
+    car.anchor.y = 0.5;
+	// setup events
+    car.on('click', showTrack);
+    car.on('tap', showTrack);
+	car.on ("rightclick", clearTrack);
+	
+		
+	
+	// set scale for the car  sto telos DEN 8a to 8eloume!!!!!!!!!!!!!!!!!
+	car.scale.x = car.scale.y = 0.8;
+		
+    car.position.x = 200;
+    car.position.y = 150;
+	car.rotation = 0;
+    //add car to stage
+    stage.addChild(car);
+	
+// path Areaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+	 var pathArea = new PIXI.Graphics (); // clickable area.....
+	pathArea.lineStyle(0);
+    pathArea.beginFill(0x003300, 0.5); // ligo pio aspro
+    pathArea.drawRect (0, 0, 800, 600);
+	pathArea.visible=false;
+	pathArea.interactive = false;
+	
+		pathArea
+		.on("mousedown", pathAreaClick)
+		.on('touchstart', pathAreaClick);
+		
+	path.addChildAt(pathArea, 0);
+	
+
+
+	
+	var pathLine = new PIXI.Graphics();
+	path.addChildAt(pathLine,1); // *****************************************
+	
+	stage.addChild (path);   // add to main stage
+	
+	var editIndex = 0; // gia na doume poio kounietai...
+
+    
+	
+	
+	// 2 empodia proxeiro*********************************
+	var graphics2 = new PIXI.Graphics();
+graphics2.lineStyle(0, 0x0000FF);
+graphics2.beginFill(0xFF700B, 1);
+graphics2.drawRect(300, 80, 20, 120);
+graphics2.drawRect(450, 350, 40, 120);
+
+graphics2.lineStyle(5, 0x0066FF,1);
+graphics2.beginFill(0x000099, .5);
+
+// draw a second shape
+graphics2.moveTo(-50,610);
+graphics2.quadraticCurveTo(150, 350, 250,610);
+	
+	// kai ena mle os xaradra.....????
+	
+	/*
+	graphics2.lineStyle(1, 0x000000);
+	graphics2.beginFill(0xFFFF0B, 0.5);
+	graphics2.drawCircle(470, 90,5);
+	graphics2.drawCircle(300, 90,5);
+    graphics2.endFill();
+	*/
+	obstacles.addChild(graphics2);
+	// add obstacles to stage
+	stage.addChild (obstacles); 
+	
+	// tracks****************************************
+	var graphics3 = new PIXI.Graphics();
+	graphics3.lineStyle(1, 0x000000);
+	graphics3.beginFill(0xFFFF0B, 0.5);
+	
+	// tracks.addChild(graphics3);
+	stage.addChild (tracks); //******************************************
+	
+	
+	// panel 2 buttons sto panel >stage .container !!! gia visible +/-
+	var btnSet = new PIXI.Graphics();
+	var btnSend = new PIXI.Graphics();	
+		
+	var btnText = new PIXI.Text("Set", {font:"20px Arial", fill:"red"});
+	btnText.x = 690;
+	btnText.y = 15;
+
+	btnSet.lineStyle (2, 0xFF00FF, 1);
+	btnSet.beginFill (0x006600, 0.25);
+	btnSet.drawRoundedRect(680, 10, 50, 40, 15);
+	btnSet.endFill();
+	panel.addChild(btnText);
+	panel.addChild(btnSet);
+	
+	btnSet.interactive = true;
+	
+	btnSet.click=function(mouseData)
+	{
+		console.log("Start an Set!");	
+		this.alpha = 1;
+			graphics3.clear();
+			path.interactive = true;
+			pathArea.interactive= true;
+			pathArea.visible = true;
+			
+			carMove = 0;
+			
+			
+
+	}
+	
+	btnSet.mousedown=function(mouseData)
+	{
+	if (pointMeshX.length>2) { 
+		path.removeChildren (2, pointMeshX.length+2);
+	}	
+		// path.reseting 
+		//for (var i = 2; i < pointMeshX.length; i++) 
+      //{   
+	  console.log("removing.....");
+	//	path.removeChil(i);
+     // }
+	 pointMeshX.length = 0;
+	 pointMeshY.length = 0;
+	  	
+		this.alpha = 0.25;
+		drawPath();
+		//renderer.render(path);
+	}
+
+	var btnText = new PIXI.Text("Send", {font:"20px Arial", fill:"red"});
+	btnText.x = 740;
+	btnText.y = 15;
+
+	btnSend.lineStyle (2, 0xFF00FF, 1);
+	btnSend.beginFill (0xFF00BB, 0.25);
+	btnSend.drawRoundedRect(740, 10, 50, 40, 15);
+	btnSend.endFill();
+	panel.addChild(btnText);
+	panel.addChild(btnSend);
+	
+	btnSend.interactive = true;
+	
+	btnSend.click=function(mouseData)
+	{
+		console.log("Clear and Send!");
+		this.alpha = 1;
+		//anchorP.interactive = false;
+        //anchorP.buttonMode = false;
+		pathArea.interactive = false;
+		pathArea.visible = false;
+		path.interactive = false;
+		carMove = 1;
+		
+		
+		//EMPTYING ARRAY ------> pointMesh.length = 0; oxi asto na fainontai.... mono false
+	 
+	}  
+	
+	btnSend.mousedown=function(mouseData)
+	{
+		this.alpha = 0.25;
+		
+	}
+	
+  stage.addChild (panel);   // add to main stage
+  // stage.addChild (path);
+ 
+//***************************************************************************************************************** 
+ /*  
+  
+    //array that holds info for all frames
+    var frameBuffer = {};
+
+    //object that holds info for current frame
+    var frame = {
+        x: 0, 
+        y: 0,
+        rotation: 0
+    };
+
+    //first frame
+    frameBuffer[0] = { "x" : car.position.x,  "y" : car.position.y, "rotation" : car.rotation};
+
+    //set first frame to last frame for the first run
+    var lastFrame;
+    lastFrame = frameBuffer[0];
+    var currentFrame;
+    //start count from 1
+    var count = 1;
+
+*/
+	
+	// my DUMMY DATA**********************************************************************
+                 // for demo ONLY*****************************
+	var xx1 = 0 ;
+	var yy1 = 0;
+	var xx2=0;
+	var yy2=0;
+	var xx=0;
+	var yy=0;
+	var step = 1;
+	var gonia=0;
+	var str = "dummy";
+	var rotation =0;
+	var indexx = 0;
+	var carPath = {x:0, y:0};   //index [0]
+	
+	
+	function showTrack () // car button****************************************
+{
+ 	tracks.visible= !tracks.visible;
+}
+
+	function clearTrack () // car button clear tracks****************************************
+{
+ 	graphics3.clear();
+}
+
+
+/*
+function cancelClick ()
+{
+ 	carPath.length = 0; // empting the path array
+//	stage.removeChild(path); //mporei na 8elei mono index no.....
+}
+
+*/
+  //  animate();
+	requestAnimationFrame( animate );
+	
+
+
+	//******************************* functions **************************************************************************************
+function pathAreaClick(event)
+	{
+	console.log ("Add new path point!!!");
+	this.data = event.data;
+     var newPosition = this.data.getLocalPosition(this.parent);
+     createAnchor(Math.floor(newPosition.x), Math.floor(newPosition.y)); 
+// 	 console.log(newPosition.x, newPosition.y); // GIATI mono to x dekadikoooooo GIATI?????
+//     this.data = null;
+	}
+	
+	
+	
+function createAnchor(x, y)
+{
+    var  anchorP = new PIXI.Sprite(pointTexture);
+  
+	pointMeshX.push(x);
+    pointMeshY.push(y);
+
+console.log("Length: "+pointMeshX.length + "  X: "+pointMeshX[pointMeshX.length-1] +"    Y:  "+pointMeshY[pointMeshY.length-1]);
+  
+     anchorP.interactive = true;
+     anchorP.buttonMode = true;
+     anchorP.anchor.set(0.5);
+
+
+    // setup events
+     anchorP
+        // events for drag start
+        .on('mousedown', onDragStart)
+        .on('touchstart', onDragStart)
+        // events for drag end
+        .on('mouseup', onDragEnd)
+        .on('mouseupoutside', onDragEnd)
+        .on('touchend', onDragEnd)
+        .on('touchendoutside', onDragEnd)
+        // events for drag move
+        .on('mousemove', onDragMove)
+        .on('touchmove', onDragMove);
+
+    // move the sprite to its designated position
+     anchorP.position.x = x;
+     anchorP.position.y = y;
+
+    // add it to the stage
+    path.addChildAt(anchorP,pointMeshX.length+1); //*******************
+    //path.addChild(pathArea);
+	// stage.addChild (path);
+  //  renderer.render(path);
+	drawPath();
+  
+   
+}
+
+
+function onDragStart(event)
+{
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true; 
+  	editIndex = path.getChildIndex(this);
+    console.log("item id "+path.getChildIndex(this)+"  X="+pointMeshX[editIndex-2]);
+
+}
+
+function onDragEnd()
+{
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+  	editIndex = 0;
+  	drawPath();
+  	
+}
+
+function onDragMove()
+{
+    if (this.dragging)
+    {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+      pointMeshX[editIndex-2] = Math.floor(newPosition.x);
+      pointMeshY[editIndex-2] = Math.floor(newPosition.y);
+	  
+           
+    }
+}
+
+
+
+function drawPath() 
+{
+	pathLine.clear(); 
+	if (pointMeshX.length > 1)  
+	{
+	
+	 
+	 pathLine.lineStyle(2, 0x33FF00);
+	// path.removeChildAt(1);
+  		  
+    
+	  console.log ("path points: "+ pointMeshX.length); 
+	    
+      pathLine.moveTo(pointMeshX[0],pointMeshY[0]);
+	  console.log(pointMeshX[0],pointMeshY[0]);
+       
+      for (var i = 1; i < pointMeshX.length; i++) 
+       {  
+			  
+        pathLine.lineTo(pointMeshX[i],pointMeshY[i]); 
+		pathLine.moveTo(pointMeshX[i],pointMeshY[i]); // bug in pixi.js !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		console.log(pointMeshX[i],pointMeshY[i]);
+       }
+    //path.addChildAt(pathLine, 1);  
+    }
+	    
+}
+
+
+// ************************************************ LOOPA *******************************************	
+    function animate() {
+	
+        requestAnimationFrame(animate);
+		//graphics3.lineStyle(1, 0x000000);
+		graphics3.beginFill(0xFFFF0B, 0.5);
+		
+		xx=50;
+		yy=50;
+		rotation = (Math.PI*0.5);
+		
+		console.log (carMove);
+		if (carMove ==1)
+		{
+		//console.log (carMove);
+		 //  xx yy to trexon xx/yy (initial =0) indexx=0 kai synexizei++ me to sent > indexx=0
+		// prosoxi se oles tis diereseis meta math.loop!!
+		
+		  if (indexx = 0) //PROTI kinisi - initialize emfanizetai sto xx1/yy1
+		   { 
+		    xx1 = pointMeshX[indexx];
+		    yy1 = pointMeshY[indexx];
+		    xx = xx1;
+			yy = yy1;
+		    }
+		
+			
+		  xx1 = pointMeshX[indexx];
+		  yy1 = pointMeshY[indexx];
+		  xx2 =pointMeshX[indexx+1];
+		  yy2 =pointMeshY[indexx+1];
+		 
+		  if ((xx=xx2) && (yy=yy2) && (indexx <= pointMeshX.length)) // eftase sto xx2/yy2 kai exei akoma path points...
+		  {
+		    indexx += 1;
+		    if ((Math.abs(pointMeshX[indexx+1]-pointMeshX[indexx])) >= (Math.abs(pointMeshY[indexx+1]-pointMeshY[indexx])))
+		      { 
+		 	   step = ((Math.abs(pointMeshX[indexx+1]-pointMeshX[indexx])* 10));   /// animation speed variable!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 	  } else {
+			   step = ((Math.abs(pointMeshY[indexx+1]-pointMeshY[indexx])* 10));
+			 }
+		  }
+		 	  
+		 xx= xx1+ Math.floor(((pointMeshX[indexx+1]-pointMeshX[indexx]) / step));  //xx=xx1+((xx2-xx1)/step)
+		 yy= yy1+ Math.floor(((pointMeshY[indexx+1]-pointMeshY[indexx]) / step));
+		 rotation = Math.atan2((xx2-xx1), ((yy2-yy1)*(-1)));
+		  
+		  
+		}
+		//******************************my Dummy Data Generator *********************************************
+	    
+//		 str = xx +"*"+yy;
+//        var parsed = str.split('*');
+
+//        var rotation = Math.atan2((parsed[0] - lastFrame.x), (parsed[1] - lastFrame.y)*(-1));
+      /*
+        currentFrame = {"x" : parsed[0], "y" : parsed[1], "rotation" : rotation};
+
+        if ((lastFrame.x != currentFrame.x) || (lastFrame.y != currentFrame.y))
+        {
+
+        frameBuffer[count] = currentFrame;
+        
+       // car.position.x = currentFrame.x;
+       // car.position.y = currentFrame.y;
+       // car.rotation = rotation;
+
+		
+		graphics3.drawCircle(~~currentFrame.x, ~~currentFrame.y, 2);
+		
+		
+		tracks.addChild(graphics3);
+		
+       // renderer.render(stage);
+		//renderer.render(path);
+        lastFrame = currentFrame;
+		
+		*/
+		graphics3.drawCircle(xx, yy, 2);
+		tracks.addChild(graphics3);
+	    car.position.x = xx
+        car.position.y = yy;
+		car.rotation = rotation;
+		
+		renderer.render(stage);
+    }	
+
+
+	}
+
+
+    </script>
+</body>
+</html>

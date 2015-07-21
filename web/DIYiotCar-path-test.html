@@ -1,0 +1,205 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>pixi.js Path Working</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+        }
+    </style>
+	<script src="js/pixi.min.js"></script>
+</head>
+<body>
+    <script>
+	
+var renderer = PIXI.autoDetectRenderer(800, 600);
+document.body.appendChild(renderer.view);
+
+// create the root of the scene graph
+var stage = new PIXI.Container();
+stage.interactive = true;
+
+var pointMeshX=[0];
+var pointMeshY=[0];
+
+// create a texture from an image path
+var texture = PIXI.Texture.fromImage('img/point.png');
+
+
+var pathArea = new PIXI.Graphics();
+	pathArea.lineStyle(0);
+    pathArea.beginFill(0xFFFFFF, 0.2);
+    pathArea.drawRect (0, 0, 800, 600);
+	pathArea.visible=true;
+	pathArea.interactive = true;
+ 	stage.addChild(pathArea);
+
+    
+	pathArea
+		.on("mousedown", pathAreaClick)
+		.on('touchstart', pathAreaClick);
+	
+  
+
+var pathLine = new PIXI.Graphics();
+	stage.addChild(pathLine);
+
+var editIndex = 0; // gia na doume poio kounietai...
+
+
+requestAnimationFrame( animate );
+  
+// *************************************END BODY***********************
+
+function animate() {
+
+         
+    requestAnimationFrame(animate);
+	
+    // render the stage
+    renderer.render(stage);
+}
+
+
+
+function createAnchor(x, y)
+{
+    // create our little bunny friend..
+    var  anchorP = new PIXI.Sprite(texture);
+  
+	pointMeshX.push(x);
+    pointMeshY.push(y);
+
+console.log(pointMeshX.length + "  X/Y "+pointMeshX[pointMeshX.length-1] +" / "+pointMeshY[pointMeshY.length-1]);
+  
+    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
+     anchorP.interactive = true;
+
+    // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
+     anchorP.buttonMode = true;
+
+    // center the bunny's anchor point
+     anchorP.anchor.set(0.5);
+
+    // make it a bit bigger, so it's easier to grab
+    // bunny.scale.set(3);
+
+    // setup events
+     anchorP
+        // events for drag start
+        .on('mousedown', onDragStart)
+        .on('touchstart', onDragStart)
+        // events for drag end
+        .on('mouseup', onDragEnd)
+        .on('mouseupoutside', onDragEnd)
+        .on('touchend', onDragEnd)
+        .on('touchendoutside', onDragEnd)
+        // events for drag move
+        .on('mousemove', onDragMove)
+        .on('touchmove', onDragMove);
+
+    // move the sprite to its designated position
+     anchorP.position.x = x;
+     anchorP.position.y = y;
+
+    // add it to the stage
+    stage.addChildAt(anchorP, pointMeshX.length-1); //*******************
+    
+    drawPath();
+  
+   
+}
+
+
+function onDragStart(event)
+{
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+  
+  	editIndex = stage.getChildIndex(this);
+    console.log("item id "+stage.getChildIndex(this));
+
+  //  var rawPosition = this.data.getLocalPosition(this.parent);
+    
+//  for (var i = 1 ; i = pointMeshY.length-1; i++){
+//       if var yy = rawPosition.y;
+//    if pointMesh
+//      }
+}
+
+function onDragEnd()
+{
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+  	editIndex = 0;
+  	drawPath();
+  	
+}
+
+function onDragMove()
+{
+    if (this.dragging)
+    {
+        var newPosition = this.data.getLocalPosition(this.parent);
+        this.position.x = newPosition.x;
+        this.position.y = newPosition.y;
+      pointMeshX[editIndex] = newPosition.x;
+      pointMeshY[editIndex] = newPosition.y;
+           
+    }
+}
+
+
+function pathAreaClick (event)
+{
+    this.data = event.data;
+     var newPosition = this.data.getLocalPosition(this.parent);
+     createAnchor(Math.floor(newPosition.x), Math.floor(newPosition.y)); 
+// 	 console.log(newPosition.x, newPosition.y); // GIATI mono to x dekadikoooooo GIATI?????
+//     this.data = null;
+}
+
+
+
+function drawPath() 
+{
+	
+ 
+  	console.log(pointMeshX.length); 
+  	
+  
+    if (pointMeshX.length > 2) {
+      
+
+    pathLine.clear();
+    
+    pathLine.lineStyle(2, 0x33FF00);
+    pathLine.moveTo(pointMeshX[1],pointMeshY[1]);
+        
+     
+      for (var i = 2; i < pointMeshX.length; i++) 
+      {   
+        pathLine.lineTo(pointMeshX[i],pointMeshY[i]); 
+		pathLine.moveTo(pointMeshX[i],pointMeshY[i]); 
+		console.log(pointMeshX[i],pointMeshY[i]);
+      }
+//    stage.addChild(pathLine);      
+    }
+
+		
+ 
+}
+
+</script>
+ 
+    </body>
+</html>
+

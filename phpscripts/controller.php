@@ -47,8 +47,8 @@ $DIYlocked= 0;
 // ************************************************
 
 // vriski tin thessi tou auto
-require_once("/root/phpscripts/functions.php");
-require_once("/root/phpscripts/position.php");
+require_once("/root/dimitris/functions.php");
+require_once("/root/dimitris/position.php");
                                                                                        
 
 
@@ -58,50 +58,50 @@ require_once("/root/phpscripts/position.php");
 // ************************************************
 
 
-	//fopen motor write
-	$serial = new phpSerial;
-	$serial->deviceSet($DIYmotors);
-	$serial->confBaudRate(9600);
-	$serial->confParity("none");
-	$serial->confCharacterLength(8);
-	$serial->confStopBits(1);
-	$serial->confFlowControl("none");
+    //fopen motor write
+    $serial = new phpSerial;
+    $serial->deviceSet($DIYmotors);
+    $serial->confBaudRate(9600);
+    $serial->confParity("none");
+    $serial->confCharacterLength(8);
+    $serial->confStopBits(1);
+    $serial->confFlowControl("none");
     
         /*$exec='@w'.$rodal.':'.$rodar.'#';
-		$serial->deviceOpen();
-		$serial->sendMessage("@w080:080#");
-		$serial->deviceClose();
+        $serial->deviceOpen();
+        $serial->sendMessage("@w080:080#");
+        $serial->deviceClose();
      sleep(5);
      echo"TELEIWSE H FORWARD";
 stop();
 echo"TELEIWSE TO STOP";
 sleep(5);     
 $serial->deviceOpen();
-		$serial->sendMessage("@q#");
-		$serial->deviceClose();
+        $serial->sendMessage("@q#");
+        $serial->deviceClose();
 echo "TELEIWSE TOTE ME Q";    
     sleep(5);
     
     /*
     sleep(5);
     $exec='@s'.$rodal.':'.$rodar.'#';
-		$serial->deviceOpen();
-		$serial->sendMessage("@s080:080#");
-		$serial->deviceClose(); 
+        $serial->deviceOpen();
+        $serial->sendMessage("@s080:080#");
+        $serial->deviceClose(); 
     sleep(5);
     $exec='@a'.$rodal.':'.$rodar.'#';
-		$serial->deviceOpen();
-		$serial->sendMessage("@a080:080#");
-		$serial->deviceClose(); 
+        $serial->deviceOpen();
+        $serial->sendMessage("@a080:080#");
+        $serial->deviceClose(); 
     sleep(5);
     $exec='@d'.$rodal.':'.$rodar.'#';
-		$serial->deviceOpen();
-		$serial->sendMessage("@d080:080#");
-		$serial->deviceClose(); 
+        $serial->deviceOpen();
+        $serial->sendMessage("@d080:080#");
+        $serial->deviceClose(); 
     sleep(5);
     $serial->deviceOpen();
-		$serial->sendMessage("@q#");
-		$serial->deviceClose();
+        $serial->sendMessage("@q#");
+        $serial->deviceClose();
         sleep(5);
     
    */
@@ -109,14 +109,14 @@ echo "TELEIWSE TOTE ME Q";
 
 // fopen for write data cloud                                                                            
 if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){            
-	echo "Cannot link with cloud, wrong usb connected";                    
-	exit;                                                                   
+    echo "Cannot link with cloud, wrong usb connected";                    
+    exit;                                                                   
 }                                                                               
 
 // fopen for read sonar data                                                                            
 if (!$sensors = popen("cat /dev/ttysonar & cat /dev/ttyimu | tee", "r")){            
-	echo "Cannot link with arduinos, wrong usb connected";                    
-	exit;                                                                   
+    echo "Cannot link with arduinos, wrong usb connected";                    
+    exit;                                                                   
 }        
 
 
@@ -126,20 +126,20 @@ if (!$sensors = popen("cat /dev/ttysonar & cat /dev/ttyimu | tee", "r")){
 
 function shutdown()
 {
-	$exec='echo @q# > /dev/ttymotor';
-	exec($exec);
+    $exec='echo @q# > /dev/ttymotor';
+    exec($exec);
 }
 
 
 
 function refreshDIYData($sensors) {
-	global $DIYdistance_LEFT, $DIYdistance,$DIYdistance_DOWN, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
+    global $DIYdistance_LEFT, $DIYdistance,$DIYdistance_DOWN, $DIYdistance_RIGHT, $DIYleftWheel, $DIYrightWheel, $DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
     do {
     //IMU:ac_ GIa accelerometer,g_ Gia gyroscope 
     //global $ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
-	// ---------------------------------------------------------                                                                      
-	// --------------  read sonar   -----------------------                                                                           
-	// ---------------------------------------------------------                                                                      
+    // ---------------------------------------------------------                                                                      
+    // --------------  read sonar   -----------------------                                                                           
+    // ---------------------------------------------------------                                                                      
     $buffer = trim(fgets($sensors, 4096)); 
     //echo $buffer;
        if ( trim($buffer)=="" ){                                                                                                 
@@ -149,9 +149,9 @@ function refreshDIYData($sensors) {
         $sonar_raw = substr($buffer, 1 , strlen($buffer) - 1 );   //echo $sonar_raw;                                              
         $sonar_movement = explode('*', $buffer);             // echo $sonar_movement;
         if(count($sonar_movement) <= 7) {
-	// --------------------------------------------------------                                                                      
-	// --------------   GLOBALS sonar    -----------------------                                                                      
-	// ---------------------------------------------------------                                                                      
+    // --------------------------------------------------------                                                                      
+    // --------------   GLOBALS sonar    -----------------------                                                                      
+    // ---------------------------------------------------------                                                                      
                                                                                                                                  
         $DIYdistance_LEFT = substr(trim($sonar_movement[0]),1);
         $DIYdistance = trim($sonar_movement[1]);                                                                                  
@@ -161,18 +161,20 @@ function refreshDIYData($sensors) {
         $DIYrightWheel = trim($sonar_movement[5]);                                                                                
         $DIYtemperature = trim($sonar_movement[6], '#');        
         
-        if($DIYdistance==0) 
+       /* if($DIYdistance>=4) 
             $DIYdistance=99;
-        if($DIYdistance_LEFT==0) 
+        if($DIYdistance_LEFT>=0) 
             $DIYdistance_LEFT=99;
-        if($DIYdistance_RIGHT==0)
-            $DIYdistance_RIGHT=99; 
+        if($DIYdistance_RIGHT>=0)
+            $DIYdistance_RIGHT=99;
+        if($DIYdistance_DOWN>=7)
+            $DIYdistance_DOWN=99;*/
         //echo "right $DIYrightWheel left $DIYleftWheel"; 
         } else {        
             $imu_data = $sonar_movement;
-        	// ---------------------------------------------------------                                                                      
-	// --------------   GLOBALS imu    -----------------------                                                                      
-	// ---------------------------------------------------------                                                                            
+            // ---------------------------------------------------------                                                                      
+    // --------------   GLOBALS imu    -----------------------                                                                      
+    // ---------------------------------------------------------                                                                            
        $ac_X = substr(trim($imu_data[0]),1);                                                                             
         $ac_Y = trim($imu_data[1]);                                                                                  
         $ac_Z = trim($imu_data[2]);   
@@ -216,7 +218,7 @@ while (!feof($sensors)) {
        $exec='@q#';
             $serial->deviceOpen();
           //  sleep(0.5); 
-		    $serial->sendMessage($exec);
+            $serial->sendMessage($exec);
            // sleep(0.1); 
             $serial->deviceClose();
          //    sleep(1);   
@@ -226,16 +228,16 @@ while (!feof($sensors)) {
     }    // Quit on F10
     
      //sleep(0.01); 
-	refreshDIYData($sensors);
+    refreshDIYData($sensors);
 
 // ---------------------------------------------------------
 // --------------  car position      -----------------------
 // ---------------------------------------------------------
-		 carscript();  
+         carscript();  
 // ---------------------------------------------------------
 // --------------   write data for cloud -------------------
 // ---------------------------------------------------------
-		 //writeCloud(); 
+         //writeCloud(); 
 }
 echo "Main loop broke";  
 ?>

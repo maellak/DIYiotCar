@@ -4,7 +4,7 @@
 include "/root/phpscripts/PHP-Serial/src/PhpSerial.php";
 
 //set tty
-exec("/root/admin/resettty.sh");
+//exec("/root/admin/resettty.sh");
                                                                                                                  
 // ************************************************
 // ***************** GLOBALS **********************

@@ -1,5 +1,5 @@
 #!/bin/sh
 echo 1 > /tmp/controller.run
-/root/phpscripts/controller.php -mabc -x101 -y101
+/root/dimitris/controller.php -mabc -x101 -y101
 
 

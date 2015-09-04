@@ -8,26 +8,26 @@ $time = time();
 
 function writeCloud(){
     global $time,$DIYdistance_LEFT,$DIYdistance,$DIYdistance_RIGHT,$DIYdistance_DOWN,$DIYleftWheel,$DIYrightWheel,$DIYtemperature,$ac_X,$ac_Y,$ac_Z,$g_X,$g_Y,$g_Z,$head,$pitch,$roll;
-       	//DIYdirection       w,s,a,d                                                                        
-       	//DIYposx       x thessi               
-       	//DIYposy       y thessi                               
-       	// fopen for write data cloud                                                                            
+        //DIYdirection       w,s,a,d                                                                        
+        //DIYposx       x thessi               
+        //DIYposy       y thessi                               
+        // fopen for write data cloud                                                                            
 if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){            
-	echo "Cannot link with cloud, wrong usb connected";                    
-	exit;                                                                   
+    echo "Cannot link with cloud, wrong usb connected";                    
+    exit;                                                                   
 }     
         
         $DIYdirection = trim($GLOBALS['curDirection']);
-       	$DIYposx = trim($GLOBALS['posx']);
-       	$DIYposy = trim($GLOBALS['posy']);     
-       	$DIYcloud = "@$time*$DIYdirection*$DIYposx*$DIYposy";//$time 4
+        $DIYposx = trim($GLOBALS['posx']);
+        $DIYposy = trim($GLOBALS['posy']);     
+        $DIYcloud = "@$time*$DIYdirection*$DIYposx*$DIYposy";//$time 4
         $DIYcloud .= "*$DIYdistance_LEFT*$DIYdistance*$DIYdistance_RIGHT*$DIYdistance_DOWN*$DIYleftWheel*$DIYrightWheel*$DIYtemperature"; //7
         $DIYcloud .= "*$ac_X*$ac_Y*$ac_Z*$g_X*$g_Y*$g_Z*$head*$pitch*$roll";//9
         $DIYcloud .= "*".MAP_NAME."*".BOUNDARY_X."*".BOUNDARY_Y."#";//3
         $DIYcloud .= "\n";     
         echo "CLOUD --  $DIYcloud\n"; 
-	//$p=$GLOBALS['DIYpipecloud'];
-	$p = $DIYpipecloud;
+    //$p=$GLOBALS['DIYpipecloud'];
+    $p = $DIYpipecloud;
     fwrite($p, $DIYcloud."\n");  
     
 }
@@ -39,40 +39,40 @@ if (!$DIYpipecloud = fopen("/root/arduinocloud", "r+")){
 //function for forward 
 function forward()
 {
-	global $serial, $curDirection;
-	
-	if($curDirection != 'w'){ 
+    global $serial, $curDirection;
+    
+    if($curDirection != 'w'){ 
     echo "MPHKA FORWARD!!!!!!!!!!";
-		sleep(0.01);
+        sleep(0.01);
         $curDirection = 'w';
         $rodal = $GLOBALS['DIYrodal'];
-		$rodar = $GLOBALS['DIYrodar'];
+        $rodar = $GLOBALS['DIYrodar'];
         $exec='@w'.$rodal.':'.$rodar.'#';
         /*$LR_O = $L_O-$R_O;     
         if($LR_O>10)
             $rodar+=1;
         else if($LR_O<-10)
             $rodal+=1;
-		$exec='@w'.$rodal.':'.$rodar.'#';
+        $exec='@w'.$rodal.':'.$rodar.'#';
         echo "L_O = $L_O and R_O=$R_O diff = $LR_O";*/
         $serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
+        $serial->sendMessage($exec);
+        $serial->deviceClose();
+    }
     //else{
         //$curDirection = 'w';
         //$LR_O = $L_O-$R_O;     
-		//$rodal = $GLOBALS['DIYrodal'];
-		//$rodar = $GLOBALS['DIYrodar'];
+        //$rodal = $GLOBALS['DIYrodal'];
+        //$rodar = $GLOBALS['DIYrodar'];
         /*if($LR_O>10)
             $rodar+=1;
         else if($LR_O<-10)
             $rodal+=1;
-		$exec='@w'.$rodal.':'.$rodar.'#';
+        $exec='@w'.$rodal.':'.$rodar.'#';
         echo "L_O = $L_O and R_O=$R_O diff = $LR_O";
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
+        $serial->deviceOpen();
+        $serial->sendMessage($exec);
+        $serial->deviceClose();
         */
     //}
 
@@ -81,35 +81,35 @@ function forward()
 //function for backward
 function backward()
 {
-	global $serial, $curDirection;
-	//// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
-	//stopBeforeCD('s', $curDirection);
+    global $serial, $curDirection;
+    //// stopBeforeCD('wkatefthinsi pou theloume na pame', $curDirection)
+    //stopBeforeCD('s', $curDirection);
 
     /* 
-	if($curDirection != 's'){
-		echo "backkkkkkkkkkkkk";
-		$curDirection = 's';
+    if($curDirection != 's'){
+        echo "backkkkkkkkkkkkk";
+        $curDirection = 's';
 
-		$rodal = $GLOBALS['DIYrodal'];
-		$rodar = $GLOBALS['DIYrodar'];
-		$exec="@s$rodal:$rodar#";
+        $rodal = $GLOBALS['DIYrodal'];
+        $rodar = $GLOBALS['DIYrodar'];
+        $exec="@s$rodal:$rodar#";
 
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	}
+        $serial->deviceOpen();
+        $serial->sendMessage($exec);
+        $serial->deviceClose();
+    }
     */
         if($curDirection != 's')
     {
         $curDirection = 's' ;
         sleep(0.01);
         $rodal = $GLOBALS['DIYrodal'];
-		$rodar = $GLOBALS['DIYrodar'];
+        $rodar = $GLOBALS['DIYrodar'];
         $exec = "@s".$rodal.":".$rodar."#";
-		$serial->deviceOpen(); 
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	    echo "!BACK!";
+        $serial->deviceOpen(); 
+        $serial->sendMessage($exec);
+        $serial->deviceClose();
+        echo "!BACK!";
         //sleep(1);
         //$carIsRunning = TRUE;       
     }
@@ -156,54 +156,54 @@ function rotate($m,$d){
 //function for stop
 function stop()
 {
-	global $serial, $DIYleftWheel, $sensors, $curDirection;
+    global $serial, $DIYleftWheel, $sensors, $curDirection;
 
-	//chamilonoume tachitita 
-	//$rodastop = $GLOBALS['DIYrodastop'];
+    //chamilonoume tachitita 
+    //$rodastop = $GLOBALS['DIYrodastop'];
 
-	/*if( $curDirection == 'w' ){
-		echo "chamilono tachitita w$rodastop:$rodastop ";
-		$exec='@w'.$rodastop.':'.$rodastop.'#';
- 	}elseif( $curDirection == 's'){
-		echo "chamilono tachitita s$rodastop:$rodastop ";
-		$exec="@s$rodastop:$rodastop#";
-	}elseif( $curDirection == 'a'){
-		echo "chamilono tachitita a$rodastop:$rodastop ";
-		$exec="@a$rodastop:$rodastop#";
-	}elseif( $curDirection == 'd'){
-		echo "chamilono tachitita d$rodastop:$rodastop ";
-		$exec="@d$rodastop:$rodastop#";
-	}*/
+    /*if( $curDirection == 'w' ){
+        echo "chamilono tachitita w$rodastop:$rodastop ";
+        $exec='@w'.$rodastop.':'.$rodastop.'#';
+    }elseif( $curDirection == 's'){
+        echo "chamilono tachitita s$rodastop:$rodastop ";
+        $exec="@s$rodastop:$rodastop#";
+    }elseif( $curDirection == 'a'){
+        echo "chamilono tachitita a$rodastop:$rodastop ";
+        $exec="@a$rodastop:$rodastop#";
+    }elseif( $curDirection == 'd'){
+        echo "chamilono tachitita d$rodastop:$rodastop ";
+        $exec="@d$rodastop:$rodastop#";
+    }*/
     if($curDirection != 'q')
     {
         sleep(0.01);
         $curDirection='q';
         $exec = "@q#";
-		$serial->deviceOpen();
-		$serial->sendMessage($exec);
-		$serial->deviceClose();
-	    echo "!STOP!";
+        $serial->deviceOpen();
+        $serial->sendMessage($exec);
+        $serial->deviceClose();
+        echo "!STOP!";
         //sleep(1);
         //$carIsRunning = TRUE;
         
     }
-	//echo $DIYleftWheel;
-	//echo " sssssssssssssssssssdsdsdfgdfghgfhgfhjfgf\n";
+    //echo $DIYleftWheel;
+    //echo " sssssssssssssssssssdsdsdfgdfghgfhgfhjfgf\n";
 
-	/*if($curDirection != 'q' || $curDirection != '0')
+    /*if($curDirection != 'q' || $curDirection != '0')
     {
-		while($DIYleftWheel == 0)
+        while($DIYleftWheel == 0)
         {
             //sleep(0.5); echo 'sleeping...'."\n"; 
             refreshDIYData($sensors);
         }
-			$curDirection = 'q';
-			echo " parking ";
-			$exec="@q#";
-			$serial->deviceOpen();
-			$serial->sendMessage($exec);
-			$serial->deviceClose();
-	}
+            $curDirection = 'q';
+            echo " parking ";
+            $exec="@q#";
+            $serial->deviceOpen();
+            $serial->sendMessage($exec);
+            $serial->deviceClose();
+    }
 */
 }
 
@@ -211,13 +211,13 @@ function stop()
 //function stopBeforeCD(directionpouthelo, aftopoukaneitora)
 function stopBeforeCD($d, $m)
 {
-	$curDirection=$m;
+    $curDirection=$m;
         if( $d == 'w' && $curDirection != 'w' ){          
                 stop();              
         }
         elseif( $d == 's' && $curDirection != 's')
         {     
-		echo " stopallagis ";
+        echo " stopallagis ";
                 stop();              
         }
         elseif( $d == 'a' && $curDirection != 'a')

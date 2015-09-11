@@ -1,5 +1,0 @@
-
-
-Warning: socket_connect(): unable to connect [111]: Connection refused in /root/phpscripts/carscript.php on line 11
-socket_connect() failed.
-Reason: () Connection refused

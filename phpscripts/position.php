@@ -1,5 +1,4 @@
 <?php
-// 0 3
 $curMove = '0';
 $direction = 90;
 $posx = 0;
@@ -8,7 +7,7 @@ $posy = 0;
 $nextPosy = 0;
 define ('DEGREES_BETWEEN_DOTS', 36); 
 define('CAR_WHEEL_RADIUS', 3);
-define('OBSTACLE', 20);
+define('OBSTACLE', 10);
 define('GROUND_DISTANCE', 4);
 $carIsRunning=TRUE;
 
@@ -39,17 +38,13 @@ function movementLogic() {
     echo "center" . $DIYdistance . "\n";
     echo "right" . $DIYdistance_RIGHT . "\n";
     echo "Current" . $curDirection . "\n";
-    //echo "logic";
-    //echo $carIsRunning;
-   // echo " $DIYdistance_LEFT $DIYdistance, $DIYdistance_RIGHT, $carIsRunningyyy \n" ;
-      
         if ( $carIsRunning ) { 
             //echo " forward ";
             if (  (  $DIYdistance_RIGHT >= OBSTACLE && $DIYdistance_LEFT >= OBSTACLE && $DIYdistance >= OBSTACLE ) && ( ($curDirection != 's') && ($curDirection != 'a') && ($curDirection != 'd') ) ){    
                 forward();//
                 $carIsRunning = TRUE;
             } 
-            else if(  $DIYdistance_RIGHT < OBSTACLE && $DIYdistance_LEFT < OBSTACLE && $DIYdistance < OBSTACLE )
+            else if(  $DIYdistance_RIGHT < OBSTACLE && $DIYdistance_LEFT < OBSTACLE && $DIYdistance <= OBSTACLE )
             {
                 backward();
                 $carIsRunning = TRUE;
@@ -75,21 +70,11 @@ function movementLogic() {
             */ 
             else{  
                  stop();
-                //stop();//backward(); //prosorina
-                //echo "Brhka empodio\n";
                 $carIsRunning = TRUE;//FALSE;
             } 
 
             
         }       
-        /*else 
-        {
-            //stop();
-            //echo "Stops from position.php";
-            $carIsRunning = TRUE;
-        }*/
-        
-    
 }
 
 function carscript() {
@@ -101,48 +86,11 @@ function carscript() {
         recalculateCoordinates();
     }
     $prevDIYLeftWheel = $DIYleftWheel;
-
-
-
-    /*
-    if($nextPosx < 0 || $nextPosx > BOUNDARY_X || $nextPosy < 0 || $nextPosy > BOUNDARY_Y){
-        // Out of boundary. Handle same as obstacle.
-        echo "It has to stop and rotate" . $direction . "!!";
-        
-        rotate(160,'a');
-        //$carIsRunning = TRUE; 
-        movementLogic();
-        recalculateCoordinates();
-        echo "Rotated... in bounds again";
-        
-    
-        
-    } else {
-        */
         // we are still inside the boundary. Update posx and posy and execute normal logic.
         $posx = $nextPosx;
         $posy = $nextPosy;
         movementLogic();        
-    //} 
-    //var_dump($posx.' '.$posy.' '.$DIYleftWheel.' '.$prevDIYLeftWheel);
-   //echo " Dir= $curDirection ";
-    
 }
-
-//echo 'going forward';
-
-
-// A boundary limit has been detected. Choose a move to avoid
-/*function handleBoundary() {
-    global $DIYdistance_LEFT, $DIYdistance_RIGHT;
-    if($DIYdistance_LEFT > $DIYdistance_RIGHT){
-        left();
-    }else{
-        right();
-    }
-}*/
-
-// An obstacle has been detected. Choose a move to avoid it
 
 register_shutdown_function(function() {
     shutdown();

@@ -1,1 +1,0 @@
-/usr/bin/socat -u  file:/dev/ttyACM1,nonblock,raw,echo=0,crnl,icanon=1,waitlock=/var/run/tty,b9600 system:'tee /root/x > /dev/null' & 

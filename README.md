@@ -3,5 +3,9 @@
 Επίσης έχει αναπτυχθεί web περιβάλλον για την έναρξη και λήξη της κίνησης του αυτοκινήτου καθώς και την παρουσίαση των μετρήσεων των αισθητήρων & της κίνησης του αυτοκινήτου.
 Το αυτοκίνητο μπορεί να κινείται αυτόνομα σε επίπεδο χώρο αποφεύγοντας τα εμπόδια που υπάρχουν στην επιφάνεια κίνησης. 
 http://diyiot.eu
+
+
 https://www.youtube.com/playlist?list=PLMrHcYxljcofk07QLa8VVkRRwzvbHXzu1
+
+
 https://www.youtube.com/playlist?list=PLMrHcYxljcoe_zk5ryx6ZanRVcJ38Wdai
